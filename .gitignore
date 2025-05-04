@@ -1,0 +1,3 @@
+# dont track generated js files
+js/*
+!js/.gitkeep
