@@ -145,13 +145,20 @@ export class Grid {
     left: GridElement;
     right: GridElement;
 
-    constructor() {
-        this.bottom = constructXZGrid(4, 4, -5);
-        this.top = constructXZGrid(4, 4, 5);
-        this.back = constructXYGrid(4, 10, -2);
-        this.front = constructXYGrid(4, 10, 2);
-        this.left = constructZYGrid(10, 4, -2);
-        this.right = constructZYGrid(10, 4, 2);
+    constructor(xSize: number, ySize: number, zSize: number) {
+        const maxX = xSize / 2;
+        const minX = -maxX;
+        const maxY = ySize / 2;
+        const minY = -maxY;
+        const maxZ = zSize / 2;
+        const minZ = -maxZ;
+
+        this.bottom = constructXZGrid(xSize, zSize, minY);
+        this.top = constructXZGrid(xSize, zSize, maxY);
+        this.back = constructXYGrid(xSize, ySize, minZ);
+        this.front = constructXYGrid(xSize, ySize, maxZ);
+        this.left = constructZYGrid(ySize, zSize, minX);
+        this.right = constructZYGrid(ySize, zSize, maxX);
     }
 
     initVao(gl: WebGL2RenderingContext, shader: Shader) {
@@ -179,5 +186,5 @@ export class Grid {
  * @returns {Cube} the resulting cube
  */
 export function getGrid(): Grid {
-    return new Grid();
+    return new Grid(4, 10, 4);
 }
