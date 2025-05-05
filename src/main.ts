@@ -1,7 +1,16 @@
+import * as glm from './gl-matrix/index.js';
+
 import * as util from './util.js';
 import * as ui from './ui.js';
+import { getCube } from './objects/cube.js';
+import { getFile, loadFile } from './files.js';
+import { Shader } from './shader.js';
+import { getGrid } from './objects/grid.js';
 
 async function setup(): Promise<WebGL2RenderingContext | null> {
+    await loadFile('shaders/default.frag');
+    await loadFile('shaders/default.vert');
+
     // get the canvas object and handle null
     const canvas = document.getElementById(
         'canvas',
@@ -33,6 +42,42 @@ async function setup(): Promise<WebGL2RenderingContext | null> {
 }
 
 async function main(gl: WebGL2RenderingContext): Promise<void> {
+    const projectionMatrix = glm.mat4.create();
+    const globalTransformationMatrix = glm.mat4.create();
+    const updatedViewMatrix = glm.mat4.create();
+    const viewMatrix = glm.mat4.create();
+
+    const eye = glm.vec3.fromValues(10.0, 5.0, 10.0);
+    const target = glm.vec3.fromValues(0.0, 0.0, 0.0);
+    // glm.vec3.add(target, eye, glm.vec3.fromValues(0, 0, -1));
+    glm.mat4.lookAt(viewMatrix, eye, target, [0, 1, 0]);
+
+    const { width, height } = (
+        document.getElementById('canvas') as HTMLElement
+    ).getBoundingClientRect();
+    const ratio = width / height;
+    const halfWorldWidth = 15.0;
+    glm.mat4.ortho(
+        projectionMatrix,
+        -halfWorldWidth,
+        halfWorldWidth,
+        -halfWorldWidth / ratio,
+        halfWorldWidth / ratio,
+        -50.0,
+        50.0,
+    );
+
+    const shader = new Shader(gl)
+        .addShader(getFile('shaders/default.vert'), gl.VERTEX_SHADER)
+        .addShader(getFile('shaders/default.frag'), gl.FRAGMENT_SHADER)
+        .link();
+
+    const cube = getCube();
+    cube.initVao(gl, shader);
+
+    const grid = getGrid();
+    grid.initVao(gl, shader);
+
     let lastTime = 0;
     let lastUpdate = 0;
     const draw = (time: number): void => {
@@ -45,6 +90,17 @@ async function main(gl: WebGL2RenderingContext): Promise<void> {
 
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
+        glm.mat4.multiply(
+            updatedViewMatrix,
+            viewMatrix,
+            globalTransformationMatrix,
+        );
+
+        shader.bind();
+        shader.projViewMatrix(gl, projectionMatrix, updatedViewMatrix);
+
+        cube.draw(gl, shader);
+        grid.draw(gl, shader);
         window.requestAnimationFrame(draw);
     };
     window.requestAnimationFrame(draw);

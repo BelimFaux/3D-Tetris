@@ -25,13 +25,3 @@ export function resizeCanvas(canvas: HTMLCanvasElement): void {
         canvas.height = desiredHeight;
     }
 }
-
-/**
- * reads in a file from a path
- *
- * @param {string} path - the path of the file
- * @returns {Promise<string>} the contents of the file
- */
-export async function getFileContents(path: string): Promise<string> {
-    return await fetch(path).then((response) => response.text());
-}
