@@ -3,17 +3,20 @@ import * as glm from '../gl-matrix/index.js';
 import * as util from '../util.js';
 
 import type { Shader } from '../shader';
+import { transformMat4 } from '../gl-matrix/vec3.js';
 
 const GRID_COLOR = [1, 1, 1, 1];
 
 class GridElement {
     vertices;
     indices;
+    midpoint;
     vaoIndex: WebGLVertexArrayObject = -1;
 
-    constructor(vertices: Float32Array, indices: Uint16Array) {
+    constructor(vertices: Float32Array, indices: Uint16Array, midpoint: vec3) {
         this.vertices = vertices;
         this.indices = indices;
+        this.midpoint = midpoint;
     }
 
     initVao(gl: WebGL2RenderingContext, shader: Shader) {
@@ -42,7 +45,13 @@ class GridElement {
         gl.vertexAttribPointer(shader.locAColor, 3, gl.FLOAT, false, 0, 0);
     }
 
-    draw(gl: WebGL2RenderingContext, shader: Shader) {
+    draw(gl: WebGL2RenderingContext, shader: Shader, globalTransformationMatrix: mat4, camPos: vec3) {
+        const mid = glm.vec3.clone(this.midpoint);
+        glm.vec3.transformMat4(mid, mid, globalTransformationMatrix);
+
+        // test if face is infront of insides
+        if (glm.vec3.dot(mid, camPos) >= 0.0) return;
+
         shader.bind();
         const modelMatrix = glm.mat4.create();
 
@@ -101,6 +110,7 @@ function constructABCGrid(
     return new GridElement(
         new Float32Array(vertices.flat()),
         new Uint16Array(indices.flat()),
+        getPoint(0, 0, cVal),
     );
 }
 
@@ -174,13 +184,18 @@ export class Grid {
         this.right.initVao(gl, shader);
     }
 
-    draw(gl: WebGL2RenderingContext, shader: Shader) {
-        this.bottom.draw(gl, shader);
-        this.back.draw(gl, shader);
-        this.left.draw(gl, shader);
-        // this.front.draw(gl, shader);
-        // this.top.draw(gl, shader);
-        // this.right.draw(gl, shader);
+    draw(
+        gl: WebGL2RenderingContext,
+        shader: Shader,
+        globalTransformationMatrix: mat4,
+        camPos: vec3,
+    ) {
+        this.bottom.draw(gl, shader, globalTransformationMatrix, camPos);
+        this.back.draw(gl, shader, globalTransformationMatrix, camPos);
+        this.left.draw(gl, shader, globalTransformationMatrix, camPos);
+        this.front.draw(gl, shader, globalTransformationMatrix, camPos));
+        this.top.draw(gl, shader, globalTransformationMatrix, camPos)
+        this.right.draw(gl, shader, globalTransformationMatrix, camPos));
     }
 }
 

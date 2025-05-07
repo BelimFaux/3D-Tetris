@@ -101,7 +101,7 @@ async function main(gl: WebGL2RenderingContext): Promise<void> {
         shader.projViewMatrix(gl, projectionMatrix, updatedViewMatrix);
 
         cube.draw(gl, shader);
-        grid.draw(gl, shader);
+        grid.draw(gl, shader, globalTransformationMatrix, eye);
         window.requestAnimationFrame(draw);
     };
     window.requestAnimationFrame(draw);
