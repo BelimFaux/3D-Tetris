@@ -3,7 +3,6 @@ import * as glm from '../gl-matrix/index.js';
 import * as util from '../util.js';
 
 import type { Shader } from '../shader';
-import { transformMat4 } from '../gl-matrix/vec3.js';
 
 const GRID_COLOR = [1, 1, 1, 1];
 
@@ -45,7 +44,12 @@ class GridElement {
         gl.vertexAttribPointer(shader.locAColor, 3, gl.FLOAT, false, 0, 0);
     }
 
-    draw(gl: WebGL2RenderingContext, shader: Shader, globalTransformationMatrix: mat4, camPos: vec3) {
+    draw(
+        gl: WebGL2RenderingContext,
+        shader: Shader,
+        globalTransformationMatrix: mat4,
+        camPos: vec3,
+    ) {
         const mid = glm.vec3.clone(this.midpoint);
         glm.vec3.transformMat4(mid, mid, globalTransformationMatrix);
 
@@ -53,10 +57,6 @@ class GridElement {
         if (glm.vec3.dot(mid, camPos) >= 0.0) return;
 
         shader.bind();
-        const modelMatrix = glm.mat4.create();
-
-        gl.uniformMatrix4fv(shader.locUTransform, false, modelMatrix);
-
         gl.bindVertexArray(this.vaoIndex);
         gl.drawElements(gl.LINES, this.indices.length, gl.UNSIGNED_SHORT, 0);
     }
@@ -187,15 +187,19 @@ export class Grid {
     draw(
         gl: WebGL2RenderingContext,
         shader: Shader,
+        viewMatrix: mat4,
         globalTransformationMatrix: mat4,
         camPos: vec3,
     ) {
+        shader.bind();
+        gl.uniformMatrix4fv(shader.locUTransform, false, viewMatrix);
+
         this.bottom.draw(gl, shader, globalTransformationMatrix, camPos);
         this.back.draw(gl, shader, globalTransformationMatrix, camPos);
         this.left.draw(gl, shader, globalTransformationMatrix, camPos);
-        this.front.draw(gl, shader, globalTransformationMatrix, camPos));
-        this.top.draw(gl, shader, globalTransformationMatrix, camPos)
-        this.right.draw(gl, shader, globalTransformationMatrix, camPos));
+        this.front.draw(gl, shader, globalTransformationMatrix, camPos);
+        this.top.draw(gl, shader, globalTransformationMatrix, camPos);
+        this.right.draw(gl, shader, globalTransformationMatrix, camPos);
     }
 }
 

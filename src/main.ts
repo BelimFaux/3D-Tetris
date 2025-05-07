@@ -48,9 +48,14 @@ async function main(gl: WebGL2RenderingContext): Promise<void> {
     const updatedViewMatrix = glm.mat4.create();
     const viewMatrix = glm.mat4.create();
 
-    const eye = glm.vec3.fromValues(7.0, 10.0, 7.0);
+    const eye = glm.vec3.fromValues(0.0, 10.0, 0.0);
     const target = glm.vec3.fromValues(0.0, 0.0, 0.0);
-    glm.mat4.lookAt(viewMatrix, eye, target, util.AXIS.Y);
+    let up = util.AXIS.Y;
+    if (eye[0] === target[0] && eye[2] === target[2]) {
+        up = util.AXIS.Z; // Use Z-axis as up when looking straight down
+    }
+    glm.mat4.lookAt(viewMatrix, eye, target, up);
+    console.log(viewMatrix);
 
     const { width, height } = (
         document.getElementById('canvas') as HTMLElement
@@ -98,10 +103,16 @@ async function main(gl: WebGL2RenderingContext): Promise<void> {
             globalTransformationMatrix,
         );
 
-        shader.projViewMatrix(gl, projectionMatrix, updatedViewMatrix);
+        shader.projMatrix(gl, projectionMatrix);
 
-        cube.draw(gl, shader);
-        grid.draw(gl, shader, globalTransformationMatrix, eye);
+        cube.draw(gl, shader, updatedViewMatrix);
+        grid.draw(
+            gl,
+            shader,
+            updatedViewMatrix,
+            globalTransformationMatrix,
+            eye,
+        );
         window.requestAnimationFrame(draw);
     };
     window.requestAnimationFrame(draw);

@@ -13,7 +13,7 @@ export class Shader {
     locUProjection: WebGLUniformLocation = -1;
     locUView: WebGLUniformLocation = -1;
     locUInvView: WebGLUniformLocation = -1;
-    locUMidpoint: WebGLUniformLocation = -1;
+    locUNormal: WebGLUniformLocation = -1;
 
     /**
      * initialize a new shader program in a gl context
@@ -72,13 +72,13 @@ export class Shader {
         this.locANormal = this.gl.getAttribLocation(this.program, 'a_normal');
 
         this.locUTransform =
-            this.gl.getUniformLocation(this.program, 'u_transform') || -1;
+            this.gl.getUniformLocation(this.program, 'u_modelview') || -1;
 
         this.locUProjection =
             this.gl.getUniformLocation(this.program, 'u_projection') || -1;
 
-        this.locUView =
-            this.gl.getUniformLocation(this.program, 'u_view') || -1;
+        this.locUNormal =
+            this.gl.getUniformLocation(this.program, 'u_normal') || -1;
 
         return this;
     }
@@ -88,14 +88,11 @@ export class Shader {
      *
      * @param {WebGL2RenderingContext} gl - The WebGL context.
      * @param {mat4} projectionMatrix - The projection matrix.
-     * @param {mat4} viewMatrix - The view matrix.
      */
-    public projViewMatrix(
+    public projMatrix(
         gl: WebGL2RenderingContext,
         projectionMatrix: mat4,
-        viewMatrix: mat4,
     ): void {
-        gl.uniformMatrix4fv(this.locUView, false, viewMatrix);
         gl.uniformMatrix4fv(this.locUProjection, false, projectionMatrix);
     }
 

@@ -1,6 +1,5 @@
 import * as glm from '../gl-matrix/index.js';
-
-import type { Shader } from '../shader';
+import type { Shader } from '../shader.js';
 
 const vertices = new Float32Array(
     [
@@ -37,6 +36,41 @@ const vertices = new Float32Array(
     ].flat(),
 );
 
+const normals = new Float32Array(
+    [
+        // Front face
+        [0.0, 0.0, 1.0],
+        [0.0, 0.0, 1.0],
+        [0.0, 0.0, 1.0],
+        [0.0, 0.0, 1.0],
+        // Back face
+        [0.0, 0.0, -1.0],
+        [0.0, 0.0, -1.0],
+        [0.0, 0.0, -1.0],
+        [0.0, 0.0, -1.0],
+        // Top face
+        [0.0, 1.0, 0.0],
+        [0.0, 1.0, 0.0],
+        [0.0, 1.0, 0.0],
+        [0.0, 1.0, 0.0],
+        // Bottom face
+        [0.0, -1.0, 0.0],
+        [0.0, -1.0, 0.0],
+        [0.0, -1.0, 0.0],
+        [0.0, -1.0, 0.0],
+        // Right face
+        [1.0, 0.0, 0.0],
+        [1.0, 0.0, 0.0],
+        [1.0, 0.0, 0.0],
+        [1.0, 0.0, 0.0],
+        // Left face
+        [-1.0, 0.0, 0.0],
+        [-1.0, 0.0, 0.0],
+        [-1.0, 0.0, 0.0],
+        [-1.0, 0.0, 0.0],
+    ].flat(),
+);
+
 const indices = new Uint16Array([
     // front
     0, 1, 2, 0, 2, 3,
@@ -55,16 +89,19 @@ const indices = new Uint16Array([
 export class Cube {
     vertices;
     indices;
+    normals;
     colors;
     vaoIndex: WebGLVertexArrayObject = -1;
 
     constructor(
         vertices: Float32Array,
         indices: Uint16Array,
+        normals: Float32Array,
         colors: Float32Array,
     ) {
         this.vertices = vertices;
         this.indices = indices;
+        this.normals = normals;
         this.colors = colors;
     }
 
@@ -74,28 +111,48 @@ export class Cube {
 
         shader.bind();
 
-        const cubeVertexBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexBuffer);
+        const vertexBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, this.vertices, gl.STATIC_DRAW);
         gl.enableVertexAttribArray(shader.locACoord);
         gl.vertexAttribPointer(shader.locACoord, 3, gl.FLOAT, false, 0, 0);
 
-        const cubeIndexBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeIndexBuffer);
+        const indexBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indices, gl.STATIC_DRAW);
 
-        const cubeColorBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, cubeColorBuffer);
+        const normalBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, this.normals, gl.STATIC_DRAW);
+        gl.enableVertexAttribArray(shader.locANormal);
+        gl.vertexAttribPointer(shader.locANormal, 3, gl.FLOAT, false, 0, 0);
+
+        const colorBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, this.colors, gl.STATIC_DRAW);
         gl.enableVertexAttribArray(shader.locAColor);
         gl.vertexAttribPointer(shader.locAColor, 4, gl.FLOAT, false, 0, 0);
     }
 
-    draw(gl: WebGL2RenderingContext, shader: Shader) {
-        const modelMatrix = glm.mat4.create();
-        glm.mat4.translate(modelMatrix, modelMatrix, [-1.5, -5.0, -1.5]);
-        gl.uniformMatrix4fv(shader.locUTransform, false, modelMatrix);
+    update(gl: WebGL2RenderingContext, shader: Shader, viewMatrix: mat4) {
+        const modelViewMatrix = glm.mat4.create();
+        glm.mat4.multiply(modelViewMatrix, modelViewMatrix, viewMatrix);
+        glm.mat4.translate(
+            modelViewMatrix,
+            modelViewMatrix,
+            [-1.5, -5.0, -1.5],
+        );
+        gl.uniformMatrix4fv(shader.locUTransform, false, modelViewMatrix);
+        if (shader.locUNormal != -1) {
+            const normalMatrix = glm.mat3.create();
+            glm.mat3.normalFromMat4(normalMatrix, modelViewMatrix);
 
+            gl.uniformMatrix3fv(shader.locUNormal, false, normalMatrix);
+        }
+    }
+
+    draw(gl: WebGL2RenderingContext, shader: Shader, viewMatrix: mat4) {
+        this.update(gl, shader, viewMatrix);
         gl.bindVertexArray(this.vaoIndex);
         gl.drawElements(
             gl.TRIANGLES,
@@ -122,5 +179,10 @@ export function getCube(): Cube {
         randomColors.push(colors);
     }
 
-    return new Cube(vertices, indices, new Float32Array(randomColors.flat()));
+    return new Cube(
+        vertices,
+        indices,
+        normals,
+        new Float32Array(randomColors.flat()),
+    );
 }
