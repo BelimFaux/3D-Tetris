@@ -6,6 +6,7 @@ import { getCube } from './objects/cube.js';
 import { getFile, loadFile } from './files.js';
 import { Shader } from './shader.js';
 import { getGrid } from './objects/grid.js';
+import { MouseHandler } from './input/mouse.js';
 
 async function setup(): Promise<WebGL2RenderingContext | null> {
     await loadFile('shaders/default.frag');
@@ -47,10 +48,9 @@ async function main(gl: WebGL2RenderingContext): Promise<void> {
     const updatedViewMatrix = glm.mat4.create();
     const viewMatrix = glm.mat4.create();
 
-    const eye = glm.vec3.fromValues(10.0, 5.0, 10.0);
+    const eye = glm.vec3.fromValues(7.0, 10.0, 7.0);
     const target = glm.vec3.fromValues(0.0, 0.0, 0.0);
-    // glm.vec3.add(target, eye, glm.vec3.fromValues(0, 0, -1));
-    glm.mat4.lookAt(viewMatrix, eye, target, [0, 1, 0]);
+    glm.mat4.lookAt(viewMatrix, eye, target, util.AXIS.Y);
 
     const { width, height } = (
         document.getElementById('canvas') as HTMLElement
@@ -66,6 +66,8 @@ async function main(gl: WebGL2RenderingContext): Promise<void> {
         -50.0,
         50.0,
     );
+
+    new MouseHandler(globalTransformationMatrix);
 
     const shader = new Shader(gl)
         .addShader(getFile('shaders/default.vert'), gl.VERTEX_SHADER)
@@ -96,7 +98,6 @@ async function main(gl: WebGL2RenderingContext): Promise<void> {
             globalTransformationMatrix,
         );
 
-        shader.bind();
         shader.projViewMatrix(gl, projectionMatrix, updatedViewMatrix);
 
         cube.draw(gl, shader);

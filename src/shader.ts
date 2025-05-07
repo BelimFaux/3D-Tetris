@@ -8,9 +8,12 @@ export class Shader {
     // variables for the attribute and uniform locations
     locACoord = -1;
     locAColor = -1;
+    locANormal = -1;
     locUTransform: WebGLUniformLocation = -1;
     locUProjection: WebGLUniformLocation = -1;
     locUView: WebGLUniformLocation = -1;
+    locUInvView: WebGLUniformLocation = -1;
+    locUMidpoint: WebGLUniformLocation = -1;
 
     /**
      * initialize a new shader program in a gl context
@@ -66,6 +69,7 @@ export class Shader {
 
         this.locACoord = this.gl.getAttribLocation(this.program, 'a_coords');
         this.locAColor = this.gl.getAttribLocation(this.program, 'a_color');
+        this.locANormal = this.gl.getAttribLocation(this.program, 'a_normal');
 
         this.locUTransform =
             this.gl.getUniformLocation(this.program, 'u_transform') || -1;

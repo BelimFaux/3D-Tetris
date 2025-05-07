@@ -1,21 +1,19 @@
 import * as glm from '../gl-matrix/index.js';
 
+import * as util from '../util.js';
+
 import type { Shader } from '../shader';
+
+const GRID_COLOR = [1, 1, 1, 1];
 
 class GridElement {
     vertices;
     indices;
-    colors;
     vaoIndex: WebGLVertexArrayObject = -1;
 
-    constructor(
-        vertices: Float32Array,
-        indices: Uint16Array,
-        colors: Float32Array,
-    ) {
+    constructor(vertices: Float32Array, indices: Uint16Array) {
         this.vertices = vertices;
         this.indices = indices;
-        this.colors = colors;
     }
 
     initVao(gl: WebGL2RenderingContext, shader: Shader) {
@@ -24,24 +22,28 @@ class GridElement {
 
         shader.bind();
 
-        const cubeVertexBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexBuffer);
+        const vertexBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, this.vertices, gl.STATIC_DRAW);
         gl.enableVertexAttribArray(shader.locACoord);
         gl.vertexAttribPointer(shader.locACoord, 3, gl.FLOAT, false, 0, 0);
 
-        const cubeIndexBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeIndexBuffer);
+        const indexBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indices, gl.STATIC_DRAW);
 
-        const cubeColorBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, cubeColorBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, this.colors, gl.STATIC_DRAW);
+        const colors = new Float32Array(
+            Array(this.vertices.length).fill(GRID_COLOR).flat(),
+        );
+        const colorBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW);
         gl.enableVertexAttribArray(shader.locAColor);
-        gl.vertexAttribPointer(shader.locAColor, 4, gl.FLOAT, false, 0, 0);
+        gl.vertexAttribPointer(shader.locAColor, 3, gl.FLOAT, false, 0, 0);
     }
 
     draw(gl: WebGL2RenderingContext, shader: Shader) {
+        shader.bind();
         const modelMatrix = glm.mat4.create();
 
         gl.uniformMatrix4fv(shader.locUTransform, false, modelMatrix);
@@ -99,7 +101,6 @@ function constructABCGrid(
     return new GridElement(
         new Float32Array(vertices.flat()),
         new Uint16Array(indices.flat()),
-        new Float32Array(Array(vertices.length).fill([1, 1, 1, 1]).flat()),
     );
 }
 
@@ -128,7 +129,11 @@ function constructXYGrid(
     );
 }
 
-function constructZYGrid(ySize: number, zSize: number, xVal: number) {
+function constructZYGrid(
+    ySize: number,
+    zSize: number,
+    xVal: number,
+): GridElement {
     return constructABCGrid(
         zSize,
         ySize,
@@ -145,20 +150,19 @@ export class Grid {
     left: GridElement;
     right: GridElement;
 
-    constructor(xSize: number, ySize: number, zSize: number) {
-        const maxX = xSize / 2;
-        const minX = -maxX;
-        const maxY = ySize / 2;
-        const minY = -maxY;
-        const maxZ = zSize / 2;
-        const minZ = -maxZ;
+    constructor() {
+        const [sizeX, sizeY, sizeZ] = util.DIM.size as [number, number, number];
+        const [minX, minY, minZ] = util.DIM.min as [number, number, number];
+        const [maxX, maxY, maxZ] = util.DIM.max as [number, number, number];
 
-        this.bottom = constructXZGrid(xSize, zSize, minY);
-        this.top = constructXZGrid(xSize, zSize, maxY);
-        this.back = constructXYGrid(xSize, ySize, minZ);
-        this.front = constructXYGrid(xSize, ySize, maxZ);
-        this.left = constructZYGrid(ySize, zSize, minX);
-        this.right = constructZYGrid(ySize, zSize, maxX);
+        this.bottom = constructXZGrid(sizeX, sizeZ, minY);
+        this.top = constructXZGrid(sizeX, sizeZ, maxY);
+
+        this.back = constructXYGrid(sizeX, sizeY, minZ);
+        this.front = constructXYGrid(sizeX, sizeY, maxZ);
+
+        this.left = constructZYGrid(sizeY, sizeZ, minX);
+        this.right = constructZYGrid(sizeY, sizeZ, maxX);
     }
 
     initVao(gl: WebGL2RenderingContext, shader: Shader) {
@@ -186,5 +190,5 @@ export class Grid {
  * @returns {Cube} the resulting cube
  */
 export function getGrid(): Grid {
-    return new Grid(4, 10, 4);
+    return new Grid();
 }
