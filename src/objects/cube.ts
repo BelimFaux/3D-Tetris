@@ -151,8 +151,9 @@ export class Cube {
         const modelViewMatrix = glm.mat4.create();
 
         glm.mat4.multiply(modelViewMatrix, modelViewMatrix, viewMatrix);
-        glm.mat4.translate(modelViewMatrix, modelViewMatrix, this.displace);
         glm.mat4.multiply(modelViewMatrix, modelViewMatrix, parentTransform);
+        glm.mat4.translate(modelViewMatrix, modelViewMatrix, this.displace);
+
         gl.uniformMatrix4fv(shader.locUTransform, false, modelViewMatrix);
         if (shader.locUNormal != -1) {
             const normalMatrix = glm.mat3.create();

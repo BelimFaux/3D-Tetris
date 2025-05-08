@@ -55,7 +55,6 @@ function main(gl: WebGL2RenderingContext): void {
         up = util.AXIS.Z; // Use Z-axis as up when looking straight down
     }
     glm.mat4.lookAt(viewMatrix, eye, target, up);
-    console.log(viewMatrix);
 
     const { width, height } = (
         document.getElementById('canvas') as HTMLElement
@@ -79,7 +78,7 @@ function main(gl: WebGL2RenderingContext): void {
         .addShader(getFile('shaders/default.frag'), gl.FRAGMENT_SHADER)
         .link();
 
-    const tetracube = new Tetracube([0, -5, 0], TETRACUBE_TYPE.TRIPOD);
+    const tetracube = new Tetracube([0, -6, 0], TETRACUBE_TYPE.TRIPOD);
     tetracube.initVaos(gl, shader);
 
     const grid = new Grid();
