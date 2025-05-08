@@ -2,11 +2,12 @@ import * as glm from './gl-matrix/index.js';
 
 import * as util from './util.js';
 import * as ui from './ui.js';
-import { getCube } from './objects/cube.js';
+import { Cube } from './objects/cube.js';
 import { getFile, loadFile } from './files.js';
 import { Shader } from './shader.js';
-import { getGrid } from './objects/grid.js';
+import { Grid } from './objects/grid.js';
 import { MouseHandler } from './input/mouse.js';
+import { TETRACUBE_TYPE, Tetracube } from './objects/tetracube.js';
 
 async function setup(): Promise<WebGL2RenderingContext | null> {
     await loadFile('shaders/default.frag');
@@ -42,7 +43,7 @@ async function setup(): Promise<WebGL2RenderingContext | null> {
     return gl;
 }
 
-async function main(gl: WebGL2RenderingContext): Promise<void> {
+function main(gl: WebGL2RenderingContext): void {
     const projectionMatrix = glm.mat4.create();
     const globalTransformationMatrix = glm.mat4.create();
     const updatedViewMatrix = glm.mat4.create();
@@ -79,10 +80,13 @@ async function main(gl: WebGL2RenderingContext): Promise<void> {
         .addShader(getFile('shaders/default.frag'), gl.FRAGMENT_SHADER)
         .link();
 
-    const cube = getCube();
+    const cube = new Cube([-1.5, -5, -1.5]);
     cube.initVao(gl, shader);
 
-    const grid = getGrid();
+    const tetracube = new Tetracube(TETRACUBE_TYPE.IPIECE);
+    tetracube.initVaos(gl, shader);
+
+    const grid = new Grid();
     grid.initVao(gl, shader);
 
     let lastTime = 0;
@@ -106,6 +110,7 @@ async function main(gl: WebGL2RenderingContext): Promise<void> {
         shader.projMatrix(gl, projectionMatrix);
 
         cube.draw(gl, shader, updatedViewMatrix);
+        tetracube.draw(gl, shader, updatedViewMatrix);
         grid.draw(
             gl,
             shader,
@@ -123,7 +128,7 @@ async function main(gl: WebGL2RenderingContext): Promise<void> {
 // handle all errors that get thrown
 try {
     const gl = await setup();
-    if (gl) await main(gl);
+    if (gl) main(gl);
 } catch (error: unknown) {
     ui.reportError(`Unhandled Exception: ${error}`);
 }

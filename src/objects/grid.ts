@@ -202,12 +202,3 @@ export class Grid {
         this.right.draw(gl, shader, globalTransformationMatrix, camPos);
     }
 }
-
-/**
- * Creates a Cube Shape
- *
- * @returns {Cube} the resulting cube
- */
-export function getGrid(): Grid {
-    return new Grid();
-}

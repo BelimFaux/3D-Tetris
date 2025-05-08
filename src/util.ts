@@ -10,9 +10,9 @@ export const AXIS = {
 };
 
 export const DIM = {
-    size: glm.vec3.fromValues(4, 10, 4),
-    min: glm.vec3.fromValues(-2, -5, -2),
-    max: glm.vec3.fromValues(2, 5, 2),
+    size: glm.vec3.fromValues(5, 10, 5),
+    min: glm.vec3.fromValues(-2.5, -5, -2.5),
+    max: glm.vec3.fromValues(2.5, 5, 2.5),
 };
 
 /**

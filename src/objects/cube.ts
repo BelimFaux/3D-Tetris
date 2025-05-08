@@ -86,23 +86,31 @@ const indices = new Uint16Array([
     20, 21, 22, 20, 22, 23,
 ]);
 
+/**
+ * Creates a Cube Shape
+ *
+ * @returns {Cube} the resulting cube
+ */
+export function getRandomColors(): Float32Array {
+    // generate random colors for each face
+    const color = [Math.random(), Math.random(), Math.random(), 1];
+    return new Float32Array(Array(vertices.length).fill(color).flat());
+}
+
 export class Cube {
     vertices;
     indices;
     normals;
     colors;
+    displace;
     vaoIndex: WebGLVertexArrayObject = -1;
 
-    constructor(
-        vertices: Float32Array,
-        indices: Uint16Array,
-        normals: Float32Array,
-        colors: Float32Array,
-    ) {
+    constructor(displace: vec3, colors: Float32Array = getRandomColors()) {
         this.vertices = vertices;
         this.indices = indices;
         this.normals = normals;
         this.colors = colors;
+        this.displace = displace;
     }
 
     initVao(gl: WebGL2RenderingContext, shader: Shader) {
@@ -137,11 +145,7 @@ export class Cube {
     update(gl: WebGL2RenderingContext, shader: Shader, viewMatrix: mat4) {
         const modelViewMatrix = glm.mat4.create();
         glm.mat4.multiply(modelViewMatrix, modelViewMatrix, viewMatrix);
-        glm.mat4.translate(
-            modelViewMatrix,
-            modelViewMatrix,
-            [-1.5, -5.0, -1.5],
-        );
+        glm.mat4.translate(modelViewMatrix, modelViewMatrix, this.displace);
         gl.uniformMatrix4fv(shader.locUTransform, false, modelViewMatrix);
         if (shader.locUNormal != -1) {
             const normalMatrix = glm.mat3.create();
@@ -161,28 +165,4 @@ export class Cube {
             0,
         );
     }
-}
-
-/**
- * Creates a Cube Shape
- *
- * @returns {Cube} the resulting cube
- */
-export function getCube(): Cube {
-    // generate random colors for each face
-    const randomColors = [];
-    const colors = [Math.random(), Math.random(), Math.random(), 1];
-    for (let i = 0; i < indices.length / 4; ++i) {
-        randomColors.push(colors);
-        randomColors.push(colors);
-        randomColors.push(colors);
-        randomColors.push(colors);
-    }
-
-    return new Cube(
-        vertices,
-        indices,
-        normals,
-        new Float32Array(randomColors.flat()),
-    );
 }
