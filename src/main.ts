@@ -2,7 +2,6 @@ import * as glm from './gl-matrix/index.js';
 
 import * as util from './util.js';
 import * as ui from './ui.js';
-import { Cube } from './objects/cube.js';
 import { getFile, loadFile } from './files.js';
 import { Shader } from './shader.js';
 import { Grid } from './objects/grid.js';
@@ -49,7 +48,7 @@ function main(gl: WebGL2RenderingContext): void {
     const updatedViewMatrix = glm.mat4.create();
     const viewMatrix = glm.mat4.create();
 
-    const eye = glm.vec3.fromValues(0.0, 10.0, 0.0);
+    const eye = glm.vec3.fromValues(7.0, 5.0, 7.0);
     const target = glm.vec3.fromValues(0.0, 0.0, 0.0);
     let up = util.AXIS.Y;
     if (eye[0] === target[0] && eye[2] === target[2]) {
@@ -80,10 +79,7 @@ function main(gl: WebGL2RenderingContext): void {
         .addShader(getFile('shaders/default.frag'), gl.FRAGMENT_SHADER)
         .link();
 
-    const cube = new Cube([-1.5, -5, -1.5]);
-    cube.initVao(gl, shader);
-
-    const tetracube = new Tetracube(TETRACUBE_TYPE.IPIECE);
+    const tetracube = new Tetracube([0, -5, 0], TETRACUBE_TYPE.TRIPOD);
     tetracube.initVaos(gl, shader);
 
     const grid = new Grid();
@@ -109,7 +105,6 @@ function main(gl: WebGL2RenderingContext): void {
 
         shader.projMatrix(gl, projectionMatrix);
 
-        cube.draw(gl, shader, updatedViewMatrix);
         tetracube.draw(gl, shader, updatedViewMatrix);
         grid.draw(
             gl,

@@ -142,10 +142,17 @@ export class Cube {
         gl.vertexAttribPointer(shader.locAColor, 4, gl.FLOAT, false, 0, 0);
     }
 
-    update(gl: WebGL2RenderingContext, shader: Shader, viewMatrix: mat4) {
+    update(
+        gl: WebGL2RenderingContext,
+        shader: Shader,
+        viewMatrix: mat4,
+        parentTransform: mat4,
+    ) {
         const modelViewMatrix = glm.mat4.create();
+
         glm.mat4.multiply(modelViewMatrix, modelViewMatrix, viewMatrix);
         glm.mat4.translate(modelViewMatrix, modelViewMatrix, this.displace);
+        glm.mat4.multiply(modelViewMatrix, modelViewMatrix, parentTransform);
         gl.uniformMatrix4fv(shader.locUTransform, false, modelViewMatrix);
         if (shader.locUNormal != -1) {
             const normalMatrix = glm.mat3.create();
@@ -155,8 +162,13 @@ export class Cube {
         }
     }
 
-    draw(gl: WebGL2RenderingContext, shader: Shader, viewMatrix: mat4) {
-        this.update(gl, shader, viewMatrix);
+    draw(
+        gl: WebGL2RenderingContext,
+        shader: Shader,
+        viewMatrix: mat4,
+        parentTransform: mat4,
+    ) {
+        this.update(gl, shader, viewMatrix, parentTransform);
         gl.bindVertexArray(this.vaoIndex);
         gl.drawElements(
             gl.TRIANGLES,
