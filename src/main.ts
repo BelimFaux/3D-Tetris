@@ -7,6 +7,7 @@ import { Shader } from './shader.js';
 import { Grid } from './objects/grid.js';
 import { MouseHandler } from './input/mouse.js';
 import { TETRACUBE_TYPE, Tetracube } from './objects/tetracube.js';
+import { KeyboardHandler } from './input/keyboard.js';
 
 async function setup(): Promise<WebGL2RenderingContext | null> {
     await loadFile('shaders/default.frag');
@@ -80,6 +81,7 @@ function main(gl: WebGL2RenderingContext): void {
 
     const tetracube = new Tetracube([0, -6, 0], TETRACUBE_TYPE.TRIPOD);
     tetracube.initVaos(gl, shader);
+    new KeyboardHandler(tetracube);
 
     const grid = new Grid();
     grid.initVao(gl, shader);
