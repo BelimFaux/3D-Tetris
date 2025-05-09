@@ -1,6 +1,6 @@
 import * as glm from '../gl-matrix/index.js';
 
-import * as util from '../util.js';
+import { DIM } from '../utils/constants.js';
 
 import type { Shader } from '../shader';
 
@@ -161,9 +161,9 @@ export class Grid {
     right: GridElement;
 
     constructor() {
-        const [sizeX, sizeY, sizeZ] = util.DIM.size as [number, number, number];
-        const [minX, minY, minZ] = util.DIM.min as [number, number, number];
-        const [maxX, maxY, maxZ] = util.DIM.max as [number, number, number];
+        const [sizeX, sizeY, sizeZ] = DIM.size as [number, number, number];
+        const [minX, minY, minZ] = DIM.min as [number, number, number];
+        const [maxX, maxY, maxZ] = DIM.max as [number, number, number];
 
         this.bottom = constructXZGrid(sizeX, sizeZ, minY);
         this.top = constructXZGrid(sizeX, sizeZ, maxY);

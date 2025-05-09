@@ -1,4 +1,4 @@
-import * as ui from './ui.js';
+import * as ui from './../ui.js';
 
 const filesMap: Map<string, string> = new Map();
 

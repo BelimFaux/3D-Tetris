@@ -1,7 +1,7 @@
 import * as glm from '../gl-matrix/index.js';
 
 import type { Shader } from '../shader';
-import { AXIS, DIM } from '../util.js';
+import { AXIS, DIM } from '../utils/constants.js';
 import { Cube, getRandomColors } from './cube.js';
 
 export enum TETRACUBE_TYPE {

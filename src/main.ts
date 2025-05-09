@@ -1,8 +1,9 @@
 import * as glm from './gl-matrix/index.js';
 
-import * as util from './util.js';
 import * as ui from './ui.js';
-import { getFile, loadFile } from './files.js';
+import { getFile, loadFile } from './utils/files.js';
+import { resizeCanvas } from './utils/webgl.js';
+import { AXIS, DIM } from './utils/constants.js';
 import { Shader } from './shader.js';
 import { Grid } from './objects/grid.js';
 import { MouseHandler } from './input/mouse.js';
@@ -31,7 +32,7 @@ async function setup(): Promise<WebGL2RenderingContext | null> {
     }
 
     // configure viewport
-    util.resizeCanvas(canvas);
+    resizeCanvas(canvas);
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
     // set bg color to #0e364f
@@ -52,9 +53,9 @@ function main(gl: WebGL2RenderingContext): void {
 
     const eye = glm.vec3.fromValues(7.0, 5.0, 7.0);
     const target = glm.vec3.fromValues(0.0, 0.0, 0.0);
-    let up = util.AXIS.Y;
+    let up = AXIS.Y;
     if (eye[0] === target[0] && eye[2] === target[2]) {
-        up = util.AXIS.Z; // Use Z-axis as up when looking straight down
+        up = AXIS.Z; // Use Z-axis as up when looking straight down
     }
     glm.mat4.lookAt(viewMatrix, eye, target, up);
 
@@ -112,7 +113,7 @@ function main(gl: WebGL2RenderingContext): void {
         shader.projMatrix(gl, projectionMatrix);
 
         if (keyboard.gravity) {
-            if (activeTetracube.position[1] >= util.DIM.min[1] + 0.5)
+            if (activeTetracube.position[1] >= DIM.min[1] + 0.5)
                 activeTetracube.translateY(-deltaTime * 0.003);
             else {
                 pieces.push(activeTetracube);
