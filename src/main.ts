@@ -8,6 +8,7 @@ import { Grid } from './objects/grid.js';
 import { MouseHandler } from './input/mouse.js';
 import { TETRACUBE_TYPE, Tetracube } from './objects/tetracube.js';
 import { KeyboardHandler } from './input/keyboard.js';
+import { RANDOM } from './gl-matrix/common.js';
 
 async function setup(): Promise<WebGL2RenderingContext | null> {
     await loadFile('shaders/default.frag');
@@ -79,9 +80,13 @@ function main(gl: WebGL2RenderingContext): void {
         .addShader(getFile('shaders/default.frag'), gl.FRAGMENT_SHADER)
         .link();
 
-    const tetracube = new Tetracube([0, -6, 0], TETRACUBE_TYPE.TRIPOD);
-    tetracube.initVaos(gl, shader);
-    new KeyboardHandler(tetracube);
+    const type: TETRACUBE_TYPE = Math.floor(RANDOM() * 7 + 1);
+    let activeTetracube = new Tetracube([0, 6, 0], type);
+    activeTetracube.initVaos(gl, shader);
+
+    const keyboard = new KeyboardHandler(activeTetracube);
+
+    const pieces: Array<Tetracube> = [];
 
     const grid = new Grid();
     grid.initVao(gl, shader);
@@ -106,7 +111,19 @@ function main(gl: WebGL2RenderingContext): void {
 
         shader.projMatrix(gl, projectionMatrix);
 
-        tetracube.draw(gl, shader, updatedViewMatrix);
+        if (keyboard.gravity) {
+            if (activeTetracube.position[1] >= util.DIM.min[1] + 0.5)
+                activeTetracube.translateY(-deltaTime * 0.003);
+            else {
+                pieces.push(activeTetracube);
+                const type: TETRACUBE_TYPE = Math.floor(RANDOM() * 7 + 1);
+                activeTetracube = new Tetracube([0, 6, 0], type);
+                activeTetracube.initVaos(gl, shader);
+                keyboard.piece = activeTetracube;
+            }
+        }
+
+        activeTetracube.draw(gl, shader, updatedViewMatrix);
         grid.draw(
             gl,
             shader,
@@ -114,6 +131,10 @@ function main(gl: WebGL2RenderingContext): void {
             globalTransformationMatrix,
             eye,
         );
+
+        pieces.forEach((piece) => {
+            piece.draw(gl, shader, updatedViewMatrix);
+        });
         window.requestAnimationFrame(draw);
     };
     window.requestAnimationFrame(draw);

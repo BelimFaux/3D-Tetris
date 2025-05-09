@@ -4,11 +4,13 @@ export class KeyboardHandler {
     keySet: Set<string>;
     canvas;
     piece;
+    gravity;
 
     constructor(piece: Tetracube) {
         this.canvas = document.getElementById('canvas') as HTMLCanvasElement;
         this.piece = piece;
         this.keySet = new Set();
+        this.gravity = false;
 
         this.canvas.addEventListener('keydown', (ev) => {
             this.keySet.add(ev.key);
@@ -40,5 +42,7 @@ export class KeyboardHandler {
 
         if (this.keySet.has('z')) this.piece.rotateZ(90);
         if (this.keySet.has('Z')) this.piece.rotateZ(-90);
+
+        if (this.keySet.has('p')) this.gravity = !this.gravity;
     }
 }

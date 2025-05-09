@@ -120,24 +120,24 @@ function buildCubeList(type: TETRACUBE_TYPE): Array<Cube> {
 }
 
 export class Tetracube {
-    cubes: Array<Cube>;
-    center: vec3;
-    translation: mat4;
-    rotation: mat4;
+    cubes;
+    position;
+    translation;
+    rotation;
 
     constructor(initialPos: vec3, type: TETRACUBE_TYPE) {
         this.cubes = buildCubeList(type);
         this.translation = glm.mat4.create();
         this.rotation = glm.mat4.create();
-        this.center = initialPos;
+        this.position = initialPos;
 
         // make sure the coordinates are centered in the grid
         const [x, y, z] = DIM.size as [number, number, number];
-        if (x % 2 == 0) initialPos[0] += 0.5;
-        if (y % 2 != 0) initialPos[1] += 0.5;
-        if (z % 2 == 0) initialPos[2] += 0.5;
+        if (x % 2 == 0) this.position[0] += 0.5;
+        if (y % 2 == 0) this.position[1] += 0.5;
+        if (z % 2 == 0) this.position[2] += 0.5;
 
-        glm.mat4.translate(this.translation, this.translation, initialPos);
+        glm.mat4.translate(this.translation, this.translation, this.position);
     }
 
     initVaos(gl: WebGL2RenderingContext, shader: Shader) {
@@ -147,7 +147,7 @@ export class Tetracube {
     }
 
     private translate(diff: vec3) {
-        glm.vec3.add(this.center, this.center, diff);
+        glm.vec3.add(this.position, this.position, diff);
         glm.mat4.translate(this.translation, this.translation, diff);
     }
 
@@ -164,13 +164,6 @@ export class Tetracube {
     }
 
     private rotate(deg: number, axis: vec3) {
-        // translate back to the initial position (inverse is a translation in the opposite direction)
-        const inv = glm.mat4.clone(this.translation);
-        inv[12] *= -1;
-        inv[13] *= -1;
-        inv[14] *= -1;
-        glm.mat4.multiply(this.rotation, this.rotation, this.translation);
-
         switch (axis) {
             case AXIS.X:
                 glm.mat4.rotateX(
@@ -201,9 +194,6 @@ export class Tetracube {
                     axis,
                 );
         }
-
-        // translate to the origin
-        glm.mat4.multiply(this.rotation, this.rotation, inv);
         return this;
     }
 
@@ -221,8 +211,8 @@ export class Tetracube {
 
     private getTransform(): mat4 {
         const transformMatrix = glm.mat4.create();
-        glm.mat4.multiply(transformMatrix, this.translation, transformMatrix);
         glm.mat4.multiply(transformMatrix, this.rotation, transformMatrix);
+        glm.mat4.multiply(transformMatrix, this.translation, transformMatrix);
         return transformMatrix;
     }
 
