@@ -1,16 +1,14 @@
-import type { Tetracube } from '../objects/tetracube.js';
+import type { Game } from '../game.js';
 
 export class KeyboardHandler {
     keySet: Set<string>;
+    game;
     canvas;
-    piece;
-    gravity;
 
-    constructor(piece: Tetracube) {
+    constructor(game: Game) {
         this.canvas = document.getElementById('canvas') as HTMLCanvasElement;
-        this.piece = piece;
+        this.game = game;
         this.keySet = new Set();
-        this.gravity = false;
 
         this.canvas.addEventListener('keydown', (ev) => {
             this.keySet.add(ev.key);
@@ -23,26 +21,27 @@ export class KeyboardHandler {
 
     private movementHandler() {
         if (this.keySet.has('d') || this.keySet.has('ArrowRight'))
-            this.piece.translateX(1);
+            this.game.getActive().translateX(1);
 
         if (this.keySet.has('a') || this.keySet.has('ArrowLeft'))
-            this.piece.translateX(-1);
+            this.game.getActive().translateX(-1);
 
         if (this.keySet.has('w') || this.keySet.has('ArrowUp'))
-            this.piece.translateZ(-1);
+            this.game.getActive().translateZ(-1);
 
         if (this.keySet.has('s') || this.keySet.has('ArrowDown'))
-            this.piece.translateZ(1);
+            this.game.getActive().translateZ(1);
 
-        if (this.keySet.has('x')) this.piece.rotateX(90);
-        if (this.keySet.has('X')) this.piece.rotateX(-90);
+        if (this.keySet.has('x')) this.game.getActive().rotateX(90);
+        if (this.keySet.has('X')) this.game.getActive().rotateX(-90);
 
-        if (this.keySet.has('y')) this.piece.rotateY(90);
-        if (this.keySet.has('Y')) this.piece.rotateY(-90);
+        if (this.keySet.has('y')) this.game.getActive().rotateY(90);
+        if (this.keySet.has('Y')) this.game.getActive().rotateY(-90);
 
-        if (this.keySet.has('z')) this.piece.rotateZ(90);
-        if (this.keySet.has('Z')) this.piece.rotateZ(-90);
+        if (this.keySet.has('z')) this.game.getActive().rotateZ(90);
+        if (this.keySet.has('Z')) this.game.getActive().rotateZ(-90);
 
-        if (this.keySet.has('p')) this.gravity = !this.gravity;
+        if (this.keySet.has('p'))
+            this.game.options.gravity = !this.game.options.gravity;
     }
 }

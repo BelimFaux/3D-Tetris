@@ -1,15 +1,7 @@
-import * as glm from './gl-matrix/index.js';
-
 import * as ui from './ui.js';
-import { getFile, loadFile } from './utils/files.js';
+import { loadFile } from './utils/files.js';
 import { resizeCanvas } from './utils/webgl.js';
-import { AXIS, DIM } from './utils/constants.js';
-import { Shader } from './shader.js';
-import { Grid } from './objects/grid.js';
-import { MouseHandler } from './input/mouse.js';
-import { TETRACUBE_TYPE, Tetracube } from './objects/tetracube.js';
-import { KeyboardHandler } from './input/keyboard.js';
-import { RANDOM } from './gl-matrix/common.js';
+import { Game } from './game.js';
 
 async function setup(): Promise<WebGL2RenderingContext | null> {
     await loadFile('shaders/default.frag');
@@ -46,51 +38,7 @@ async function setup(): Promise<WebGL2RenderingContext | null> {
 }
 
 function main(gl: WebGL2RenderingContext): void {
-    const projectionMatrix = glm.mat4.create();
-    const globalTransformationMatrix = glm.mat4.create();
-    const updatedViewMatrix = glm.mat4.create();
-    const viewMatrix = glm.mat4.create();
-
-    const eye = glm.vec3.fromValues(7.0, 5.0, 7.0);
-    const target = glm.vec3.fromValues(0.0, 0.0, 0.0);
-    let up = AXIS.Y;
-    if (eye[0] === target[0] && eye[2] === target[2]) {
-        up = AXIS.Z; // Use Z-axis as up when looking straight down
-    }
-    glm.mat4.lookAt(viewMatrix, eye, target, up);
-
-    const { width, height } = (
-        document.getElementById('canvas') as HTMLElement
-    ).getBoundingClientRect();
-    const ratio = width / height;
-    const halfWorldWidth = 15.0;
-    glm.mat4.ortho(
-        projectionMatrix,
-        -halfWorldWidth,
-        halfWorldWidth,
-        -halfWorldWidth / ratio,
-        halfWorldWidth / ratio,
-        -50.0,
-        50.0,
-    );
-
-    new MouseHandler(globalTransformationMatrix);
-
-    const shader = new Shader(gl)
-        .addShader(getFile('shaders/default.vert'), gl.VERTEX_SHADER)
-        .addShader(getFile('shaders/default.frag'), gl.FRAGMENT_SHADER)
-        .link();
-
-    const type: TETRACUBE_TYPE = Math.floor(RANDOM() * 7 + 1);
-    let activeTetracube = new Tetracube([0, 6, 0], type);
-    activeTetracube.initVaos(gl, shader);
-
-    const keyboard = new KeyboardHandler(activeTetracube);
-
-    const pieces: Array<Tetracube> = [];
-
-    const grid = new Grid();
-    grid.initVao(gl, shader);
+    const game = new Game(gl);
 
     let lastTime = 0;
     let lastUpdate = 0;
@@ -102,40 +50,7 @@ function main(gl: WebGL2RenderingContext): void {
             lastUpdate = time;
         }
 
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-        glm.mat4.multiply(
-            updatedViewMatrix,
-            viewMatrix,
-            globalTransformationMatrix,
-        );
-
-        shader.projMatrix(gl, projectionMatrix);
-
-        if (keyboard.gravity) {
-            if (activeTetracube.position[1] >= DIM.min[1] + 0.5)
-                activeTetracube.translateY(-deltaTime * 0.003);
-            else {
-                pieces.push(activeTetracube);
-                const type: TETRACUBE_TYPE = Math.floor(RANDOM() * 7 + 1);
-                activeTetracube = new Tetracube([0, 6, 0], type);
-                activeTetracube.initVaos(gl, shader);
-                keyboard.piece = activeTetracube;
-            }
-        }
-
-        activeTetracube.draw(gl, shader, updatedViewMatrix);
-        grid.draw(
-            gl,
-            shader,
-            updatedViewMatrix,
-            globalTransformationMatrix,
-            eye,
-        );
-
-        pieces.forEach((piece) => {
-            piece.draw(gl, shader, updatedViewMatrix);
-        });
+        game.tick(deltaTime);
         window.requestAnimationFrame(draw);
     };
     window.requestAnimationFrame(draw);
