@@ -11,11 +11,13 @@ import { getFile } from './utils/files.js';
 
 interface GameOptions {
     gravity: boolean;
+    showGrid: boolean;
 }
 
 function defaultOptions(): GameOptions {
     return {
         gravity: false,
+        showGrid: false,
     };
 }
 
@@ -68,6 +70,10 @@ export class Game {
         this.options.gravity = !this.options.gravity;
     }
 
+    toggleGrid() {
+        this.options.showGrid = !this.options.showGrid;
+    }
+
     tick(deltaTime: number) {
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 
@@ -90,13 +96,18 @@ export class Game {
         }
 
         this.activePiece.draw(this.gl, this.shader, updatedViewMatrix);
-        this.grid.draw(
-            this.gl,
-            this.shader,
-            updatedViewMatrix,
-            this.globalTransformationMatrix,
-            this.camera.getEye(),
-        );
+
+        if (this.options.showGrid) {
+            this.grid.draw(this.gl, this.shader, updatedViewMatrix);
+        } else {
+            this.grid.maybeDraw(
+                this.gl,
+                this.shader,
+                updatedViewMatrix,
+                this.globalTransformationMatrix,
+                this.camera.getEye(),
+            );
+        }
 
         this.pieces.forEach((piece) => {
             piece.draw(this.gl, this.shader, updatedViewMatrix);

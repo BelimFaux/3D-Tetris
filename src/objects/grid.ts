@@ -44,7 +44,7 @@ class GridElement {
         gl.vertexAttribPointer(shader.locAColor, 3, gl.FLOAT, false, 0, 0);
     }
 
-    draw(
+    maybeDraw(
         gl: WebGL2RenderingContext,
         shader: Shader,
         globalTransformationMatrix: mat4,
@@ -55,7 +55,10 @@ class GridElement {
 
         // test if face is infront of insides
         if (glm.vec3.dot(mid, camPos) >= 0.0) return;
+        this.draw(gl, shader);
+    }
 
+    draw(gl: WebGL2RenderingContext, shader: Shader) {
         shader.bind();
         gl.bindVertexArray(this.vaoIndex);
         gl.drawElements(gl.LINES, this.indices.length, gl.UNSIGNED_SHORT, 0);
@@ -184,7 +187,7 @@ export class Grid {
         this.right.initVao(gl, shader);
     }
 
-    draw(
+    maybeDraw(
         gl: WebGL2RenderingContext,
         shader: Shader,
         viewMatrix: mat4,
@@ -194,11 +197,23 @@ export class Grid {
         shader.bind();
         gl.uniformMatrix4fv(shader.locUTransform, false, viewMatrix);
 
-        this.bottom.draw(gl, shader, globalTransformationMatrix, camPos);
-        this.back.draw(gl, shader, globalTransformationMatrix, camPos);
-        this.left.draw(gl, shader, globalTransformationMatrix, camPos);
-        this.front.draw(gl, shader, globalTransformationMatrix, camPos);
-        this.top.draw(gl, shader, globalTransformationMatrix, camPos);
-        this.right.draw(gl, shader, globalTransformationMatrix, camPos);
+        this.bottom.maybeDraw(gl, shader, globalTransformationMatrix, camPos);
+        this.back.maybeDraw(gl, shader, globalTransformationMatrix, camPos);
+        this.left.maybeDraw(gl, shader, globalTransformationMatrix, camPos);
+        this.front.maybeDraw(gl, shader, globalTransformationMatrix, camPos);
+        this.top.maybeDraw(gl, shader, globalTransformationMatrix, camPos);
+        this.right.maybeDraw(gl, shader, globalTransformationMatrix, camPos);
+    }
+
+    draw(gl: WebGL2RenderingContext, shader: Shader, viewMatrix: mat4) {
+        shader.bind();
+        gl.uniformMatrix4fv(shader.locUTransform, false, viewMatrix);
+
+        this.bottom.draw(gl, shader);
+        this.back.draw(gl, shader);
+        this.left.draw(gl, shader);
+        this.front.draw(gl, shader);
+        this.top.draw(gl, shader);
+        this.right.draw(gl, shader);
     }
 }

@@ -13,6 +13,7 @@ export class KeyboardHandler {
         this.canvas.addEventListener('keydown', (ev) => {
             this.keySet.add(ev.key);
             this.movementHandler();
+            this.viewHandler();
         });
         this.canvas.addEventListener('keyup', (ev) => {
             this.keySet.delete(ev.key);
@@ -42,5 +43,9 @@ export class KeyboardHandler {
         if (this.keySet.has('Z')) this.game.getActive().rotateZ(-90);
 
         if (this.keySet.has('p')) this.game.toggleGravity();
+    }
+
+    private viewHandler() {
+        if (this.keySet.has('g')) this.game.toggleGrid();
     }
 }
