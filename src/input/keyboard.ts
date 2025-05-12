@@ -41,7 +41,6 @@ export class KeyboardHandler {
         if (this.keySet.has('z')) this.game.getActive().rotateZ(90);
         if (this.keySet.has('Z')) this.game.getActive().rotateZ(-90);
 
-        if (this.keySet.has('p'))
-            this.game.options.gravity = !this.game.options.gravity;
+        if (this.keySet.has('p')) this.game.toggleGravity();
     }
 }

@@ -1,4 +1,4 @@
-import { RANDOM } from './gl-matrix/common.js';
+import { Camera } from './camera.js';
 import * as glm from './gl-matrix/index.js';
 
 import { KeyboardHandler } from './input/keyboard.js';
@@ -6,7 +6,7 @@ import { MouseHandler } from './input/mouse.js';
 import { Grid } from './objects/grid.js';
 import { Tetracube, TETRACUBE_TYPE } from './objects/tetracube.js';
 import { Shader } from './shader.js';
-import { AXIS, DIM } from './utils/constants.js';
+import { DIM } from './utils/constants.js';
 import { getFile } from './utils/files.js';
 
 interface GameOptions {
@@ -22,10 +22,8 @@ function defaultOptions(): GameOptions {
 export class Game {
     gl;
     options;
-
-    projectionMatrix;
+    camera;
     globalTransformationMatrix;
-    viewMatrix;
 
     shader;
 
@@ -36,12 +34,8 @@ export class Game {
     constructor(gl: WebGL2RenderingContext) {
         this.gl = gl;
         this.options = defaultOptions();
-        this.projectionMatrix = glm.mat4.create();
+        this.camera = new Camera();
         this.globalTransformationMatrix = glm.mat4.create();
-        this.viewMatrix = glm.mat4.create();
-
-        this.initOrthogonal();
-        this.initView();
 
         this.shader = new Shader(gl)
             .addShader(getFile('shaders/default.vert'), gl.VERTEX_SHADER)
@@ -60,35 +54,8 @@ export class Game {
         new KeyboardHandler(this);
     }
 
-    private initView() {
-        const eye = glm.vec3.fromValues(7.0, 5.0, 7.0);
-        const target = glm.vec3.fromValues(0.0, 0.0, 0.0);
-        let up = AXIS.Y;
-        if (eye[0] === target[0] && eye[2] === target[2]) {
-            up = AXIS.Z; // Use Z-axis as up when looking straight down
-        }
-        glm.mat4.lookAt(this.viewMatrix, eye, target, up);
-    }
-
-    private initOrthogonal() {
-        const { width, height } = (
-            document.getElementById('canvas') as HTMLElement
-        ).getBoundingClientRect();
-        const ratio = width / height;
-        const halfWorldWidth = 15.0;
-        glm.mat4.ortho(
-            this.projectionMatrix,
-            -halfWorldWidth,
-            halfWorldWidth,
-            -halfWorldWidth / ratio,
-            halfWorldWidth / ratio,
-            -50.0,
-            50.0,
-        );
-    }
-
     private spawnNewPiece() {
-        const type: TETRACUBE_TYPE = Math.floor(RANDOM() * 7 + 1);
+        const type: TETRACUBE_TYPE = Math.floor(Math.random() * 7 + 1);
         this.activePiece = new Tetracube([0, DIM.max[1], 0], type);
         this.activePiece.initVaos(this.gl, this.shader);
     }
@@ -97,17 +64,21 @@ export class Game {
         return this.activePiece;
     }
 
+    toggleGravity() {
+        this.options.gravity = !this.options.gravity;
+    }
+
     tick(deltaTime: number) {
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 
         const updatedViewMatrix = glm.mat4.create();
         glm.mat4.multiply(
             updatedViewMatrix,
-            this.viewMatrix,
+            this.camera.getView(),
             this.globalTransformationMatrix,
         );
 
-        this.shader.projMatrix(this.gl, this.projectionMatrix);
+        this.shader.projMatrix(this.gl, this.camera.getProjection());
 
         if (this.options.gravity) {
             if (this.activePiece.position[1] >= DIM.min[1] + 0.5)
@@ -124,7 +95,7 @@ export class Game {
             this.shader,
             updatedViewMatrix,
             this.globalTransformationMatrix,
-            [7, 5, 7],
+            this.camera.getEye(),
         );
 
         this.pieces.forEach((piece) => {
