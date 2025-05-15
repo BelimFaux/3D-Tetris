@@ -3,7 +3,7 @@ import * as glm from './gl-matrix/index.js';
 
 import { KeyboardHandler } from './input/keyboard.js';
 import { MouseHandler } from './input/mouse.js';
-import { CollisionEvent } from './objects/collision.js';
+import { CollisionEvent, collisionTest } from './objects/collision.js';
 import { Grid } from './objects/grid.js';
 import { Tetracube, TetracubeType } from './objects/tetracube.js';
 import { Shader } from './shader.js';
@@ -78,6 +78,18 @@ export class Game {
 
     gameOver() {
         this.pieces = [];
+        this.spawnNewPiece();
+    }
+
+    dropActive() {
+        while (this.activePiece.translateY(-0.1) != CollisionEvent.BOTTOM) {}
+
+        if (this.activePiece.testCollisions() == CollisionEvent.TOP) {
+            this.gameOver();
+            return;
+        }
+        this.activePiece.snapToGrid();
+        this.pieces.push(this.activePiece);
         this.spawnNewPiece();
     }
 
