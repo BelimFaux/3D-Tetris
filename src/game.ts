@@ -3,8 +3,9 @@ import * as glm from './gl-matrix/index.js';
 
 import { KeyboardHandler } from './input/keyboard.js';
 import { MouseHandler } from './input/mouse.js';
+import { CollisionEvent } from './objects/collision.js';
 import { Grid } from './objects/grid.js';
-import { Tetracube, TETRACUBE_TYPE } from './objects/tetracube.js';
+import { Tetracube, TetracubeType } from './objects/tetracube.js';
 import { Shader } from './shader.js';
 import { DIM } from './utils/constants.js';
 import { getFile } from './utils/files.js';
@@ -48,7 +49,8 @@ export class Game {
         this.grid.initVao(gl, this.shader);
         this.activePiece = new Tetracube(
             [0, DIM.max[1], 0],
-            TETRACUBE_TYPE.IPIECE,
+            TetracubeType.IPIECE,
+            this,
         ); // initialise just to shut up linter
         this.spawnNewPiece();
 
@@ -57,8 +59,8 @@ export class Game {
     }
 
     private spawnNewPiece() {
-        const type: TETRACUBE_TYPE = Math.floor(Math.random() * 7 + 1);
-        this.activePiece = new Tetracube([0, DIM.max[1], 0], type);
+        const type: TetracubeType = Math.floor(Math.random() * 7 + 1);
+        this.activePiece = new Tetracube([0, DIM.max[1], 0], type, this);
         this.activePiece.initVaos(this.gl, this.shader);
     }
 
@@ -74,6 +76,24 @@ export class Game {
         this.options.showGrid = !this.options.showGrid;
     }
 
+    gameOver() {
+        this.pieces = [];
+        this.spawnNewPiece();
+    }
+
+    gravity(deltaTime: number) {
+        const collision = this.activePiece.translateY(-deltaTime * 0.003);
+        if (collision != CollisionEvent.BOTTOM) return;
+
+        if (this.activePiece.testCollisions() == CollisionEvent.TOP) {
+            this.gameOver();
+            return;
+        }
+        this.activePiece.snapToGrid();
+        this.pieces.push(this.activePiece);
+        this.spawnNewPiece();
+    }
+
     tick(deltaTime: number) {
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 
@@ -87,12 +107,7 @@ export class Game {
         this.shader.projMatrix(this.gl, this.camera.getProjection());
 
         if (this.options.gravity) {
-            if (this.activePiece.position[1] >= DIM.min[1] + 0.5)
-                this.activePiece.translateY(-deltaTime * 0.003);
-            else {
-                this.pieces.push(this.activePiece);
-                this.spawnNewPiece();
-            }
+            this.gravity(deltaTime);
         }
 
         this.activePiece.draw(this.gl, this.shader, updatedViewMatrix);
