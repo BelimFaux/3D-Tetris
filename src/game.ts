@@ -1,5 +1,6 @@
 import { Camera } from './camera.js';
 import * as glm from './gl-matrix/index.js';
+import * as ui from './ui.js';
 
 import { KeyboardHandler } from './input/keyboard.js';
 import { MouseHandler } from './input/mouse.js';
@@ -76,6 +77,7 @@ export class Game {
 
         this.movePiecesBy = 0;
         this.score = 0;
+        ui.updateScore(this.score);
 
         new MouseHandler(this.globalTransformationMatrix);
         new KeyboardHandler(this);
@@ -100,6 +102,7 @@ export class Game {
     }
 
     adjustScore(killed: number) {
+        if (killed == 0) return;
         // Original BPS scoring system:
         // see https://tetris.wiki/Scoring
         switch (killed) {
@@ -115,6 +118,7 @@ export class Game {
             default:
                 this.score += 1200;
         }
+        ui.updateScore(this.score);
     }
 
     gameOver() {
@@ -168,14 +172,15 @@ export class Game {
             });
         });
 
-        let deletedCols = 0;
+        let killed = 0;
         countYMap.forEach((count, yVal) => {
             if (count == targetCount) {
-                deletedCols++;
+                killed++;
                 this.deleteCol(yVal);
             }
         });
-        this.movePiecesBy += deletedCols;
+        this.movePiecesBy += killed;
+        this.adjustScore(killed);
     }
 
     drawObjects() {

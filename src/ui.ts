@@ -23,6 +23,15 @@ export function updateTime(deltaTime: number): void {
 }
 
 /**
+ * Displays the current score on the screen
+ *
+ * @param {number} score - current score
+ */
+export function updateScore(score: number): void {
+    setValue('score', `Score: ${score} Points`);
+}
+
+/**
  * Helper function to set the innerText of an HTML Element to any value
  *
  * @param {string} id - id of the HTML Element
