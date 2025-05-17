@@ -24,22 +24,6 @@ function defaultOptions(): GameOptions {
     };
 }
 
-function debugPieces(parent: Game): Array<Tetracube> {
-    return [
-        new Tetracube([-2, DIM.min[1], 2], TetracubeType.TPIECE, parent),
-        new Tetracube([-2, DIM.min[1], 1], TetracubeType.TPIECE, parent),
-        new Tetracube([-2, DIM.min[1], 0], TetracubeType.TPIECE, parent),
-        new Tetracube([-2, DIM.min[1], -1], TetracubeType.TPIECE, parent),
-        new Tetracube([-2, DIM.min[1], -2], TetracubeType.TPIECE, parent),
-        new Tetracube([-2, DIM.min[1], -3], TetracubeType.TPIECE, parent),
-        new Tetracube([1, DIM.min[1], 2], TetracubeType.TPIECE, parent),
-        new Tetracube([1, DIM.min[1], 1], TetracubeType.TPIECE, parent),
-        new Tetracube([1, DIM.min[1], -1], TetracubeType.TPIECE, parent),
-        new Tetracube([1, DIM.min[1], -2], TetracubeType.TPIECE, parent),
-        new Tetracube([1, DIM.min[1], -3], TetracubeType.TPIECE, parent),
-    ];
-}
-
 export class Game {
     gl;
     options;
@@ -64,8 +48,6 @@ export class Game {
             .addShader(getFile('shaders/default.frag'), gl.FRAGMENT_SHADER)
             .link();
 
-        this.pieces = debugPieces(this);
-        this.pieces.forEach((piece) => piece.initVaos(gl, this.shader));
         this.grid = new Grid();
         this.grid.initVao(gl, this.shader);
         this.nextPiece = Math.floor(Math.random() * 7 + 1);
@@ -138,6 +120,7 @@ export class Game {
     gameOver() {
         this.pieces = [];
         this.spawnNewPiece();
+        this.score = 0;
     }
 
     handleLandedPiece() {
@@ -156,11 +139,16 @@ export class Game {
     }
 
     gravity(deltaTime: number) {
-        const amount = -deltaTime * 0.003;
-        const collision = this.activePiece.translateY(amount);
+        const amount = -deltaTime * 0.001;
+        let collision = CollisionEvent.NO_COLLISION;
+        if (this.options.gravity)
+            collision = this.activePiece.translateY(amount);
 
         if (this.movePiecesBy > 0) {
-            this.pieces.forEach((piece) => piece.translateY(amount));
+            this.pieces.forEach((piece) => {
+                if (piece.translateY(amount) == CollisionEvent.BOTTOM)
+                    piece.snapToGrid();
+            });
             this.movePiecesBy += amount;
         } else this.movePiecesBy = 0;
 
@@ -171,7 +159,6 @@ export class Game {
     deleteCol(yVal: number) {
         this.pieces.forEach((piece) => {
             piece.removeY(yVal);
-            if (!this.options.gravity) piece.moveIfAbove(yVal); // so the pieces donÄt hang in the air when the gravity is off
         });
     }
 
@@ -181,7 +168,7 @@ export class Game {
         this.pieces.forEach((piece) => {
             const coords = piece.getCoordinates();
             coords.forEach((coord) => {
-                const y = coord[1];
+                const y = Math.round(coord[1]);
                 const cur = countYMap.get(y) || 0;
                 countYMap.set(y, cur + 1);
             });
@@ -189,7 +176,7 @@ export class Game {
 
         let killed = 0;
         countYMap.forEach((count, yVal) => {
-            if (count == targetCount) {
+            if (count >= targetCount) {
                 killed++;
                 this.deleteCol(yVal);
             }
@@ -218,10 +205,7 @@ export class Game {
     }
 
     tick(deltaTime: number) {
-        if (this.options.gravity) {
-            this.gravity(deltaTime);
-        }
-
+        this.gravity(deltaTime);
         this.testFullCols();
         this.drawObjects();
     }
