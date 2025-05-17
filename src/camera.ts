@@ -4,8 +4,10 @@ import { AXIS } from './utils/constants.js';
 export class Camera {
     projectionMatrix;
     viewMatrix;
-    eye;
     viewTransforms;
+    perspective;
+    halfWorldWidth;
+    eye;
 
     constructor() {
         this.projectionMatrix = glm.mat4.create();
@@ -13,6 +15,8 @@ export class Camera {
         this.eye = glm.vec3.fromValues(7.0, 5.0, 7.0);
         this.viewTransforms = glm.mat4.create();
 
+        this.halfWorldWidth = 15.0;
+        this.perspective = false;
         this.initOrthogonal();
         this.initView();
     }
@@ -26,24 +30,40 @@ export class Camera {
         glm.mat4.lookAt(this.viewMatrix, this.eye, target, up);
     }
 
+    private zoom(factor: number) {
+        glm.vec3.scale(this.eye, this.eye, factor);
+        this.halfWorldWidth *= factor;
+        this.initView();
+        if (!this.perspective) this.initOrthogonal();
+    }
+
+    zoomOut() {
+        this.zoom(1.1);
+    }
+
+    zoomIn() {
+        this.zoom(0.9);
+    }
+
     initOrthogonal() {
+        this.perspective = false;
         const { width, height } = (
             document.getElementById('canvas') as HTMLElement
         ).getBoundingClientRect();
         const ratio = width / height;
-        const halfWorldWidth = 15.0;
         glm.mat4.ortho(
             this.projectionMatrix,
-            -halfWorldWidth,
-            halfWorldWidth,
-            -halfWorldWidth / ratio,
-            halfWorldWidth / ratio,
+            -this.halfWorldWidth,
+            this.halfWorldWidth,
+            -this.halfWorldWidth / ratio,
+            this.halfWorldWidth / ratio,
             -50.0,
             50.0,
         );
     }
 
     initPerspective() {
+        this.perspective = true;
         const { width, height } = (
             document.getElementById('canvas') as HTMLElement
         ).getBoundingClientRect();

@@ -1,3 +1,5 @@
+import * as glm from '../gl-matrix/index.js';
+
 import type { Game } from '../game.js';
 
 export class KeyboardHandler {
@@ -48,6 +50,30 @@ export class KeyboardHandler {
     }
 
     private viewHandler() {
+        const viewTransform = this.game.camera.getTransform();
+        const rad = glm.glMatrix.toRadian(5);
+
+        // right-handed CS => neg. angle is clockwise rot.
+        if (this.keySet.has('j'))
+            glm.mat4.rotateY(viewTransform, viewTransform, -rad);
+        if (this.keySet.has('l'))
+            glm.mat4.rotateY(viewTransform, viewTransform, rad);
+
+        if (this.keySet.has('i'))
+            glm.mat4.rotateX(viewTransform, viewTransform, -rad);
+        if (this.keySet.has('k'))
+            glm.mat4.rotateX(viewTransform, viewTransform, rad);
+
+        if (this.keySet.has('u'))
+            glm.mat4.rotateZ(viewTransform, viewTransform, -rad);
+        if (this.keySet.has('o'))
+            glm.mat4.rotateZ(viewTransform, viewTransform, rad);
+
+        if (this.keySet.has('v')) this.game.togglePerspective();
+
+        if (this.keySet.has('+')) this.game.camera.zoomIn();
+        if (this.keySet.has('-')) this.game.camera.zoomOut();
+
         if (this.keySet.has('g')) this.game.toggleGrid();
     }
 }

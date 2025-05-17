@@ -13,12 +13,14 @@ import { getFile } from './utils/files.js';
 interface GameOptions {
     gravity: boolean;
     showGrid: boolean;
+    perspective: boolean;
 }
 
 function defaultOptions(): GameOptions {
     return {
         gravity: false,
         showGrid: false,
+        perspective: false,
     };
 }
 
@@ -76,7 +78,7 @@ export class Game {
         this.score = 0;
         ui.updateScore(this.score);
 
-        new MouseHandler(this.camera.getTransform());
+        new MouseHandler(this.camera);
         new KeyboardHandler(this);
     }
 
@@ -96,6 +98,12 @@ export class Game {
 
     toggleGrid() {
         this.options.showGrid = !this.options.showGrid;
+    }
+
+    togglePerspective() {
+        const persp = (this.options.perspective = !this.options.perspective);
+        if (persp) this.camera.initPerspective();
+        else this.camera.initOrthogonal();
     }
 
     adjustScore(killed: number) {
@@ -154,6 +162,7 @@ export class Game {
     deleteCol(yVal: number) {
         this.pieces.forEach((piece) => {
             piece.removeY(yVal);
+            if (!this.options.gravity) piece.moveIfAbove(yVal); // so the pieces donÄt hang in the air when the gravity is off
         });
     }
 

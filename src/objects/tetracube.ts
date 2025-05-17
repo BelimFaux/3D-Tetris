@@ -237,6 +237,16 @@ export class Tetracube {
         });
     }
 
+    moveIfAbove(yVal: number) {
+        const transform = this.getTransform();
+        const shouldMove = this.cubes.every((cube) => {
+            const cubePos = cube.getCoord(transform);
+            return cubePos[1] > yVal;
+        });
+
+        if (shouldMove) this.rawTranslate([0, -1, 0]);
+    }
+
     snapToGrid() {
         // reverse centering of coordinate to not disturb rounding
         const [x, y, z] = DIM.size as [number, number, number];
