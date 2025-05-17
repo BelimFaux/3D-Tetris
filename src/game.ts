@@ -1,5 +1,4 @@
 import { Camera } from './camera.js';
-import * as glm from './gl-matrix/index.js';
 import * as ui from './ui.js';
 
 import { KeyboardHandler } from './input/keyboard.js';
@@ -43,7 +42,6 @@ export class Game {
     gl;
     options;
     camera;
-    globalTransformationMatrix;
 
     shader;
 
@@ -57,7 +55,6 @@ export class Game {
         this.gl = gl;
         this.options = defaultOptions();
         this.camera = new Camera();
-        this.globalTransformationMatrix = glm.mat4.create();
 
         this.shader = new Shader(gl)
             .addShader(getFile('shaders/default.vert'), gl.VERTEX_SHADER)
@@ -79,7 +76,7 @@ export class Game {
         this.score = 0;
         ui.updateScore(this.score);
 
-        new MouseHandler(this.globalTransformationMatrix);
+        new MouseHandler(this.camera.getTransform());
         new KeyboardHandler(this);
     }
 
@@ -186,30 +183,19 @@ export class Game {
     drawObjects() {
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 
-        const updatedViewMatrix = glm.mat4.create();
-        glm.mat4.multiply(
-            updatedViewMatrix,
-            this.camera.getView(),
-            this.globalTransformationMatrix,
-        );
+        const viewMatrix = this.camera.getView();
 
         this.shader.projMatrix(this.gl, this.camera.getProjection());
-        this.activePiece.draw(this.gl, this.shader, updatedViewMatrix);
+        this.activePiece.draw(this.gl, this.shader, viewMatrix);
 
         if (this.options.showGrid) {
-            this.grid.draw(this.gl, this.shader, updatedViewMatrix);
+            this.grid.draw(this.gl, this.shader, viewMatrix);
         } else {
-            this.grid.maybeDraw(
-                this.gl,
-                this.shader,
-                updatedViewMatrix,
-                this.globalTransformationMatrix,
-                this.camera.getEye(),
-            );
+            this.grid.maybeDraw(this.gl, this.shader, this.camera);
         }
 
         this.pieces.forEach((piece) => {
-            piece.draw(this.gl, this.shader, updatedViewMatrix);
+            piece.draw(this.gl, this.shader, viewMatrix);
         });
     }
 

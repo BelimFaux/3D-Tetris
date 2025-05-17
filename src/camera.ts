@@ -5,11 +5,13 @@ export class Camera {
     projectionMatrix;
     viewMatrix;
     eye;
+    viewTransforms;
 
     constructor() {
         this.projectionMatrix = glm.mat4.create();
         this.viewMatrix = glm.mat4.create();
         this.eye = glm.vec3.fromValues(7.0, 5.0, 7.0);
+        this.viewTransforms = glm.mat4.create();
 
         this.initOrthogonal();
         this.initView();
@@ -59,10 +61,20 @@ export class Camera {
     }
 
     getView(): mat4 {
-        return this.viewMatrix;
+        const updatedViewMatrix = glm.mat4.create();
+        glm.mat4.multiply(
+            updatedViewMatrix,
+            this.viewMatrix,
+            this.viewTransforms,
+        );
+        return updatedViewMatrix;
     }
 
     getProjection(): mat4 {
         return this.projectionMatrix;
+    }
+
+    getTransform(): mat4 {
+        return this.viewTransforms;
     }
 }

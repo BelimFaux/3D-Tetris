@@ -6,8 +6,8 @@ export class MouseHandler {
 
     trackingMouse = false;
 
-    start: vec3 = [0, 0, 0];
-    lastPos: vec3 = [0, 0, 0];
+    lastX: number = 0;
+    sensi: number = 10;
 
     constructor(worldMatrix: mat4) {
         this.canvas = document.getElementById('canvas') as HTMLCanvasElement;
@@ -19,25 +19,23 @@ export class MouseHandler {
     }
 
     private startMove(ev: MouseEvent) {
-        this.start = this.getPos(ev.clientX, ev.clientY);
-        this.lastPos = this.start;
+        this.lastX = this.getYPos(ev);
         this.trackingMouse = true;
     }
 
     private whileMove(ev: MouseEvent) {
         if (!this.trackingMouse) return;
+        const cur = this.getYPos(ev);
+        const d = cur - this.lastX;
 
-        const curPos = this.getPos(ev.clientX, ev.clientY);
-        const d = glm.vec3.create();
-        glm.vec3.sub(d, curPos, this.lastPos);
+        if (Math.abs(d) > 0.001) {
+            this.lastX = cur;
 
-        if (!glm.vec3.equals(d, [0, 0, 0])) {
-            const angle = 0.5 * glm.vec3.length(d);
-            const axis = glm.vec3.create();
-            glm.vec3.cross(axis, this.lastPos, curPos);
-            this.lastPos = curPos;
-
-            glm.mat4.rotate(this.worldMatrix, this.worldMatrix, angle, axis);
+            glm.mat4.rotateY(
+                this.worldMatrix,
+                this.worldMatrix,
+                this.sensi * d,
+            );
         }
     }
 
@@ -45,18 +43,7 @@ export class MouseHandler {
         this.trackingMouse = false;
     }
 
-    private getPos(x: number, y: number): vec3 {
-        let curX = (2 * x) / this.canvas.width - 1;
-        let curY = (2 * (this.canvas.height - y)) / this.canvas.height - 1;
-        let curZ = 0;
-
-        const d = curX * curX + curY * curY;
-        if (d < 1.0) curZ = Math.sqrt(1.0 - d);
-        else {
-            const a = 1.0 / Math.sqrt(d);
-            curX *= a;
-            curY *= a;
-        }
-        return glm.vec3.fromValues(curX, curY, curZ);
+    private getYPos(ev: MouseEvent) {
+        return ev.clientX / this.canvas.width;
     }
 }

@@ -3,6 +3,7 @@ import * as glm from '../gl-matrix/index.js';
 import { DIM } from '../utils/constants.js';
 
 import type { Shader } from '../shader';
+import type { Camera } from '../camera.js';
 
 const GRID_COLOR = [1, 1, 1, 1];
 
@@ -187,22 +188,19 @@ export class Grid {
         this.right.initVao(gl, shader);
     }
 
-    maybeDraw(
-        gl: WebGL2RenderingContext,
-        shader: Shader,
-        viewMatrix: mat4,
-        globalTransformationMatrix: mat4,
-        camPos: vec3,
-    ) {
+    maybeDraw(gl: WebGL2RenderingContext, shader: Shader, camera: Camera) {
+        const viewMatrix = camera.getView();
+        const camPos = camera.getEye();
+        const transformationMatrix = camera.getTransform();
         shader.bind();
         gl.uniformMatrix4fv(shader.locUTransform, false, viewMatrix);
 
-        this.bottom.maybeDraw(gl, shader, globalTransformationMatrix, camPos);
-        this.back.maybeDraw(gl, shader, globalTransformationMatrix, camPos);
-        this.left.maybeDraw(gl, shader, globalTransformationMatrix, camPos);
-        this.front.maybeDraw(gl, shader, globalTransformationMatrix, camPos);
-        this.top.maybeDraw(gl, shader, globalTransformationMatrix, camPos);
-        this.right.maybeDraw(gl, shader, globalTransformationMatrix, camPos);
+        this.bottom.maybeDraw(gl, shader, transformationMatrix, camPos);
+        this.back.maybeDraw(gl, shader, transformationMatrix, camPos);
+        this.left.maybeDraw(gl, shader, transformationMatrix, camPos);
+        this.front.maybeDraw(gl, shader, transformationMatrix, camPos);
+        this.top.maybeDraw(gl, shader, transformationMatrix, camPos);
+        this.right.maybeDraw(gl, shader, transformationMatrix, camPos);
     }
 
     draw(gl: WebGL2RenderingContext, shader: Shader, viewMatrix: mat4) {
