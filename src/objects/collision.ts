@@ -13,7 +13,7 @@ export enum CollisionEvent {
 class GridCube {
     coordinates;
 
-    private constructor(coordinates: Array<vec3>) {
+    constructor(coordinates: Array<vec3>) {
         this.coordinates = coordinates;
     }
 
@@ -61,25 +61,6 @@ class GridCube {
         }
         return CollisionEvent.NO_COLLISION;
     }
-
-    static fromTetracube(from: Tetracube, transform: mat4): GridCube {
-        const cubes = from.cubes;
-        const coordinates: Array<vec3> = [];
-        cubes.forEach((cube) => {
-            const center = glm.vec3.clone(cube.displace);
-            glm.vec3.transformMat4(center, center, transform);
-
-            // undo displacement
-            const [x, y, z] = DIM.size as [number, number, number];
-            if (x % 2 == 0) center[0] -= 0.5;
-            if (y % 2 == 0) center[1] -= 0.5;
-            if (z % 2 == 0) center[2] -= 0.5;
-
-            coordinates.push(center);
-        });
-
-        return new GridCube(coordinates);
-    }
 }
 
 function overlapsX(lhs: vec3, rhs: vec3): boolean {
@@ -108,10 +89,9 @@ function overlapsZ(lhs: vec3, rhs: vec3): boolean {
 
 export function collisionTest(
     piece: Tetracube,
-    transform: mat4,
     against: Array<Tetracube>,
 ): CollisionEvent {
-    const gridcube = GridCube.fromTetracube(piece, transform);
+    const gridcube = new GridCube(piece.getCoordinates());
 
     if (!gridcube.collisionSides()) return CollisionEvent.SIDES;
     if (!gridcube.collisionTop()) return CollisionEvent.TOP;
@@ -119,9 +99,11 @@ export function collisionTest(
 
     for (let i = 0; i < against.length; i++) {
         const elem = against[i] as Tetracube;
+
+        if (elem == piece) continue; // don't test against yourself
         if (glm.vec3.distance(elem.position, piece.position) > 4) continue; // Bounding sphere check (sphere if radius 2 from the midpoint)
 
-        const other = GridCube.fromTetracube(elem, elem.getTransform());
+        const other = new GridCube(elem.getCoordinates());
         const collision = gridcube.collisionOtherPiece(other);
         if (collision != CollisionEvent.NO_COLLISION) return collision;
     }

@@ -150,20 +150,20 @@ export class Tetracube {
         });
     }
 
-    private translate(diff: vec3): CollisionEvent {
-        const temp = glm.mat4.clone(this.translation);
+    private rawTranslate(diff: vec3) {
         glm.vec3.add(this.position, this.position, diff);
         glm.mat4.translate(this.translation, this.translation, diff);
+    }
 
-        const collision = collisionTest(
-            this,
-            this.getTransform(),
-            this.game.pieces,
-        );
-        if (
-            collision == CollisionEvent.SIDES ||
-            collision == CollisionEvent.BOTTOM
-        ) {
+    private translate(
+        diff: vec3,
+        expectedCollision: CollisionEvent,
+    ): CollisionEvent {
+        const temp = glm.mat4.clone(this.translation);
+        this.rawTranslate(diff);
+
+        const collision = collisionTest(this, this.game.pieces);
+        if (collision == expectedCollision) {
             // undo translation if there was a collision
             glm.vec3.sub(this.position, this.position, diff);
             this.translation = temp;
@@ -172,54 +172,37 @@ export class Tetracube {
     }
 
     translateX(amount: number): CollisionEvent {
-        return this.translate([amount, 0, 0]);
+        return this.translate([amount, 0, 0], CollisionEvent.SIDES);
     }
 
     translateY(amount: number): CollisionEvent {
-        return this.translate([0, amount, 0]);
+        return this.translate([0, amount, 0], CollisionEvent.BOTTOM);
     }
 
     translateZ(amount: number): CollisionEvent {
-        return this.translate([0, 0, amount]);
+        return this.translate([0, 0, amount], CollisionEvent.SIDES);
+    }
+
+    private rawRotate(rad: number, axis: vec3) {
+        switch (axis) {
+            case AXIS.X:
+                glm.mat4.rotateX(this.rotation, this.rotation, rad);
+                break;
+            case AXIS.Y:
+                glm.mat4.rotateY(this.rotation, this.rotation, rad);
+                break;
+            case AXIS.Z:
+                glm.mat4.rotateZ(this.rotation, this.rotation, rad);
+                break;
+            default:
+                glm.mat4.rotate(this.rotation, this.rotation, rad, axis);
+        }
     }
 
     private rotate(deg: number, axis: vec3): CollisionEvent {
         const temp = glm.mat4.clone(this.rotation);
-        switch (axis) {
-            case AXIS.X:
-                glm.mat4.rotateX(
-                    this.rotation,
-                    this.rotation,
-                    glm.glMatrix.toRadian(deg),
-                );
-                break;
-            case AXIS.Y:
-                glm.mat4.rotateY(
-                    this.rotation,
-                    this.rotation,
-                    glm.glMatrix.toRadian(deg),
-                );
-                break;
-            case AXIS.Z:
-                glm.mat4.rotateZ(
-                    this.rotation,
-                    this.rotation,
-                    glm.glMatrix.toRadian(deg),
-                );
-                break;
-            default:
-                glm.mat4.rotate(
-                    this.rotation,
-                    this.rotation,
-                    glm.glMatrix.toRadian(deg),
-                    axis,
-                );
-        }
-        const collision = collisionTest(
-            this,
-            this.getTransform(),
-            this.game.pieces,
-        );
+        this.rawRotate(glm.glMatrix.toRadian(deg), axis);
+        const collision = collisionTest(this, this.game.pieces);
         if (
             collision == CollisionEvent.SIDES ||
             collision == CollisionEvent.BOTTOM // exclude top since elements spawn at top
@@ -243,15 +226,14 @@ export class Tetracube {
     }
 
     testCollisions(others: Array<Tetracube> = []): CollisionEvent {
-        return collisionTest(this, this.getTransform(), others);
+        return collisionTest(this, others);
     }
 
-    removeBelow(threshold: number) {
+    removeY(yVal: number) {
         const transform = this.getTransform();
         this.cubes = this.cubes.filter((cube) => {
-            const center = glm.vec3.clone(cube.displace);
-            glm.vec3.transformMat4(center, center, transform);
-            return center[1] >= threshold;
+            const cubePos = cube.getCoord(transform);
+            return cubePos[1] != yVal;
         });
     }
 
@@ -272,7 +254,17 @@ export class Tetracube {
 
         glm.mat4.identity(this.translation);
         glm.mat4.translate(this.translation, this.translation, this.position);
-        console.log(this.position);
+    }
+
+    getCoordinates(): Array<vec3> {
+        const cubes = this.cubes;
+        const coordinates: Array<vec3> = [];
+        const transform = this.getTransform();
+        cubes.forEach((cube) => {
+            coordinates.push(cube.getCoord(transform));
+        });
+
+        return coordinates;
     }
 
     getTransform(): mat4 {

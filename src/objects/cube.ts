@@ -1,5 +1,6 @@
 import * as glm from '../gl-matrix/index.js';
 import type { Shader } from '../shader.js';
+import { DIM } from '../utils/constants.js';
 
 const vertices = new Float32Array(
     [
@@ -140,6 +141,18 @@ export class Cube {
         gl.bufferData(gl.ARRAY_BUFFER, this.colors, gl.STATIC_DRAW);
         gl.enableVertexAttribArray(shader.locAColor);
         gl.vertexAttribPointer(shader.locAColor, 4, gl.FLOAT, false, 0, 0);
+    }
+
+    getCoord(transform: mat4): vec3 {
+        const center = glm.vec3.clone(this.displace);
+        glm.vec3.transformMat4(center, center, transform);
+
+        // undo displacement
+        const [x, y, z] = DIM.size as [number, number, number];
+        if (x % 2 == 0) center[0] -= 0.5;
+        if (y % 2 == 0) center[1] -= 0.5;
+        if (z % 2 == 0) center[2] -= 0.5;
+        return center;
     }
 
     update(
