@@ -1,3 +1,5 @@
+import { TetracubeType } from './objects/tetracube.js';
+
 /**
  * Adds the error message to the error box on screen and also prints it to the console.
  *
@@ -29,6 +31,26 @@ export function updateTime(deltaTime: number): void {
  */
 export function updateScore(score: number): void {
     setValue('score', `Score: ${score} Points`);
+}
+
+/**
+ * Displays the next piece type on the screen
+ *
+ * @param {TetracubeType} type - current score
+ */
+export function updateNextPiece(type: TetracubeType): void {
+    const names = [
+        'I-Piece',
+        'O-Piece',
+        'L-Piece',
+        'T-Piece',
+        'N-Piece',
+        'Tower Right',
+        'Tower Left',
+        'Tripod',
+    ];
+    const typeName = names[type] || '';
+    setValue('nextPiece', `next Tetracube: ${typeName}`);
 }
 
 /**

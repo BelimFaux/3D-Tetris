@@ -47,6 +47,7 @@ export class Game {
 
     shader;
 
+    nextPiece: TetracubeType;
     activePiece: Tetracube;
     pieces: Array<Tetracube> = [];
     movePiecesBy;
@@ -67,12 +68,15 @@ export class Game {
         this.pieces.forEach((piece) => piece.initVaos(gl, this.shader));
         this.grid = new Grid();
         this.grid.initVao(gl, this.shader);
+        this.nextPiece = Math.floor(Math.random() * 7 + 1);
         this.activePiece = new Tetracube(
             [0, DIM.max[1], 0],
-            TetracubeType.IPIECE,
+            this.nextPiece,
             this,
-        ); // initialise just to shut up linter
-        this.spawnNewPiece();
+        );
+        this.activePiece.initVaos(gl, this.shader);
+        this.nextPiece = Math.floor(Math.random() * 7 + 1);
+        ui.updateNextPiece(this.nextPiece);
 
         this.movePiecesBy = 0;
         this.score = 0;
@@ -83,9 +87,14 @@ export class Game {
     }
 
     private spawnNewPiece() {
-        const type: TetracubeType = Math.floor(Math.random() * 7 + 1);
-        this.activePiece = new Tetracube([0, DIM.max[1], 0], type, this);
+        this.activePiece = new Tetracube(
+            [0, DIM.max[1], 0],
+            this.nextPiece,
+            this,
+        );
         this.activePiece.initVaos(this.gl, this.shader);
+        this.nextPiece = Math.floor(Math.random() * 7 + 1);
+        ui.updateNextPiece(this.nextPiece);
     }
 
     getActive(): Tetracube {
