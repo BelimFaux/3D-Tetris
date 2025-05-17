@@ -121,6 +121,7 @@ export class Game {
         this.pieces = [];
         this.spawnNewPiece();
         this.score = 0;
+        ui.updateScore(this.score);
     }
 
     handleLandedPiece() {
