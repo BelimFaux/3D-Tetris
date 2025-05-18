@@ -163,7 +163,7 @@ export class Tetracube {
         this.rawTranslate(diff);
 
         const collision = collisionTest(this, this.game.pieces);
-        if (collision == expectedCollision) {
+        if (collision & expectedCollision) {
             // undo translation if there was a collision
             glm.vec3.sub(this.position, this.position, diff);
             this.translation = temp;
@@ -204,8 +204,8 @@ export class Tetracube {
         this.rawRotate(glm.glMatrix.toRadian(deg), axis);
         const collision = collisionTest(this, this.game.pieces);
         if (
-            collision == CollisionEvent.SIDES ||
-            collision == CollisionEvent.BOTTOM // exclude top since elements spawn at top
+            collision &
+            (CollisionEvent.SIDES | CollisionEvent.BOTTOM) // exclude top since elements spawn at top
         ) {
             // undo rotation if there was a collision
             this.rotation = temp;
@@ -245,6 +245,10 @@ export class Tetracube {
         });
 
         if (shouldMove) this.rawTranslate([0, -1, 0]);
+    }
+
+    isEmpty(): boolean {
+        return this.cubes.length == 0;
     }
 
     snapToGrid() {

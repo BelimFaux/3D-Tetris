@@ -144,7 +144,7 @@ export class Game {
     }
 
     handleLandedPiece() {
-        if (this.activePiece.testCollisions() == CollisionEvent.TOP) {
+        if (this.activePiece.testCollisions() & CollisionEvent.TOP) {
             this.gameOver();
             return;
         }
@@ -154,7 +154,7 @@ export class Game {
     }
 
     dropActive() {
-        while (this.activePiece.translateY(-0.1) != CollisionEvent.BOTTOM) {}
+        while (!(this.activePiece.translateY(-0.1) & CollisionEvent.BOTTOM)) {}
         this.handleLandedPiece();
     }
 
@@ -166,13 +166,13 @@ export class Game {
 
         if (this.movePiecesBy > 0) {
             this.pieces.forEach((piece) => {
-                if (piece.translateY(amount) == CollisionEvent.BOTTOM)
+                if (piece.translateY(amount) & CollisionEvent.BOTTOM)
                     piece.snapToGrid();
             });
             this.movePiecesBy += amount;
         } else this.movePiecesBy = 0;
 
-        if (collision != CollisionEvent.BOTTOM) return;
+        if (!(collision & CollisionEvent.BOTTOM)) return;
         this.handleLandedPiece();
     }
 
@@ -180,6 +180,7 @@ export class Game {
         this.pieces.forEach((piece) => {
             piece.removeY(yVal);
         });
+        this.pieces = this.pieces.filter((piece) => !piece.isEmpty());
         console.log(`Deleted ${yVal}y xz-plane`);
     }
 
