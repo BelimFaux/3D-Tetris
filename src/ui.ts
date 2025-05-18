@@ -25,6 +25,15 @@ export function updateTime(deltaTime: number): void {
 }
 
 /**
+ * Displays the currently selected shader on the screen
+ *
+ * @param {string} selected - name of the current shader
+ */
+export function updateShader(selected: string): void {
+    setValue('shader', `current shader: ${selected}`);
+}
+
+/**
  * Displays the current score on the screen
  *
  * @param {number} score - current score
@@ -59,7 +68,7 @@ export function updateNextPiece(type: TetracubeType): void {
  * @param {string} id - id of the HTML Element
  * @param {any} value - the value which should be displayed
  */
-function setValue(id: string, value: any): void {
+export function setValue(id: string, value: any): void {
     const pElement = document.getElementById(id);
     if (pElement !== null) {
         pElement.innerText = value;

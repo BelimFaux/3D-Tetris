@@ -14,10 +14,45 @@
         <div id="left">
             <div class="widget" id="info">
                 <p id="deltaTime"></p>
+                <p id="shader"></p>
                 <p id="nextPiece"></p>
                 <p id="score"></p>
             </div>
+
+            <p class="widget">
+                Ambient: <output id="ambientOutput">0.2</output><br />
+                <input
+                    type="range"
+                    id="ambientCoefficient"
+                    value="0.2"
+                    min="0"
+                    max="1"
+                    step="0.05" />
+            </p>
+
+            <p class="widget">
+                Diffuse: <output id="diffuseOutput">0.7</output><br />
+                <input
+                    type="range"
+                    id="diffuseCoefficient"
+                    value="0.7"
+                    min="0"
+                    max="1"
+                    step="0.05" />
+            </p>
+
+            <p class="widget">
+                Specular: <output id="specularOutput">0.5</output><br />
+                <input
+                    type="range"
+                    id="specularCoefficient"
+                    value="0.5"
+                    min="0"
+                    max="1"
+                    step="0.05" />
+            </p>
         </div>
+
         <div class="widget" id="error-box">
             <span class="error-box-title">Box for Errors:</span>
         </div>

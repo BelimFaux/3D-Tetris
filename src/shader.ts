@@ -1,3 +1,9 @@
+import type { Slider } from './input/slider.js';
+import { getFile } from './utils/files.js';
+import * as ui from './ui.js';
+
+const availableShaders = ['gouraud', 'phong'];
+
 /**
  * Class to generate shader programs
  */
@@ -11,9 +17,11 @@ export class Shader {
     locANormal = -1;
     locUTransform: WebGLUniformLocation = -1;
     locUProjection: WebGLUniformLocation = -1;
-    locUView: WebGLUniformLocation = -1;
-    locUInvView: WebGLUniformLocation = -1;
+    locUEye: WebGLUniformLocation = -1;
     locUNormal: WebGLUniformLocation = -1;
+    locUAmbient: WebGLUniformLocation = -1;
+    locUDiffuse: WebGLUniformLocation = -1;
+    locUSpecular: WebGLUniformLocation = -1;
 
     /**
      * initialize a new shader program in a gl context
@@ -77,8 +85,22 @@ export class Shader {
         this.locUProjection =
             this.gl.getUniformLocation(this.program, 'u_projection') || -1;
 
+        this.locUEye = this.gl.getUniformLocation(this.program, 'u_eye') || -1;
+
         this.locUNormal =
             this.gl.getUniformLocation(this.program, 'u_normal') || -1;
+
+        this.locUAmbient =
+            this.gl.getUniformLocation(this.program, 'u_ambientCoefficient') ||
+            -1;
+
+        this.locUDiffuse =
+            this.gl.getUniformLocation(this.program, 'u_diffuseCoefficient') ||
+            -1;
+
+        this.locUSpecular =
+            this.gl.getUniformLocation(this.program, 'u_specularCoefficient') ||
+            -1;
 
         return this;
     }
@@ -101,5 +123,76 @@ export class Shader {
      */
     public bind(): void {
         this.gl.useProgram(this.program);
+    }
+
+    initCoefficients(sliders: Slider) {
+        if (this.locUAmbient != -1) {
+            this.gl.uniform1f(
+                this.locUAmbient,
+                sliders.getAmbientCoefficient(),
+            );
+        }
+        if (this.locUDiffuse != -1) {
+            this.gl.uniform1f(
+                this.locUDiffuse,
+                sliders.getDiffuseCoefficient(),
+            );
+        }
+        if (this.locUSpecular != -1) {
+            this.gl.uniform1f(
+                this.locUSpecular,
+                sliders.getSpecularCoefficient(),
+            );
+        }
+    }
+}
+
+const shaderMap = new Map<string, Shader>();
+
+/**
+ * Load all Shaders specified in the availableShaders Array into a Map
+ *
+ * @param gl {WebGL2RenderingContext} - the WebGl context
+ */
+export function loadShaders(gl: WebGL2RenderingContext) {
+    for (const name of availableShaders) {
+        const shader = loadShader(gl, name);
+        if (shader) {
+            shaderMap.set(name, shader);
+        }
+    }
+}
+
+export function getShader(name: string): Shader {
+    const ret = shaderMap.get(name);
+    if (!ret) {
+        throw `Unrecoverable Error while searching for shader: Shader ${name} not found.`;
+    }
+    return ret;
+}
+
+/**
+ * Load a shader from the name.
+ * the files are assumed to be located at 'shaders/{name}.(vert|frag)'
+ *
+ * @param gl {WebGL2RenderingContext} - the WebGl context
+ * @param name {string} - the name of the shader
+ */
+function loadShader(gl: WebGL2RenderingContext, name: string): Shader | null {
+    // load shader source
+    const vertexSource = getFile(`shaders/${name}.vert`);
+    const fragmentSource = getFile(`shaders/${name}.frag`);
+
+    try {
+        // create program from shaders
+        const shader = new Shader(gl)
+            .addShader(vertexSource, gl.VERTEX_SHADER)
+            .addShader(fragmentSource, gl.FRAGMENT_SHADER)
+            .link();
+
+        return shader;
+    } catch (e) {
+        ui.reportError(`Error while compiling shader ${name}: ${e}`);
+        return null;
     }
 }

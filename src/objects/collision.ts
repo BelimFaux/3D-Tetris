@@ -67,7 +67,7 @@ function overlapsX(lhs: vec3, rhs: vec3): boolean {
     const [x1, y1, z1] = lhs as [number, number, number];
     const [x2, y2, z2] = rhs as [number, number, number];
 
-    if (y1 == y2 && z1 == z2) return Math.abs(x1 - x2) <= 1.0;
+    if (y1 == y2 && z1 == z2) return Math.abs(x1 - x2) <= 0.99;
     return false;
 }
 
@@ -75,7 +75,7 @@ function overlapsY(lhs: vec3, rhs: vec3): boolean {
     const [x1, y1, z1] = lhs as [number, number, number];
     const [x2, y2, z2] = rhs as [number, number, number];
 
-    if (x1 == x2 && z1 == z2) return Math.abs(y1 - y2) <= 1.0;
+    if (x1 == x2 && z1 == z2) return Math.abs(y1 - y2) <= 0.99;
     return false;
 }
 
@@ -83,7 +83,7 @@ function overlapsZ(lhs: vec3, rhs: vec3): boolean {
     const [x1, y1, z1] = lhs as [number, number, number];
     const [x2, y2, z2] = rhs as [number, number, number];
 
-    if (x1 == x2 && y1 == y2) return Math.abs(z1 - z2) <= 1.0;
+    if (x1 == x2 && y1 == y2) return Math.abs(z1 - z2) <= 0.99;
     return false;
 }
 

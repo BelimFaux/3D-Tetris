@@ -2,10 +2,13 @@ import * as ui from './ui.js';
 import { loadFile } from './utils/files.js';
 import { resizeCanvas } from './utils/webgl.js';
 import { Game } from './game.js';
+import { loadShaders } from './shader.js';
 
 async function setup(): Promise<WebGL2RenderingContext | null> {
-    await loadFile('shaders/default.frag');
-    await loadFile('shaders/default.vert');
+    await loadFile('shaders/gouraud.frag');
+    await loadFile('shaders/gouraud.vert');
+    await loadFile('shaders/phong.frag');
+    await loadFile('shaders/phong.vert');
 
     // get the canvas object and handle null
     const canvas = document.getElementById(
@@ -22,6 +25,8 @@ async function setup(): Promise<WebGL2RenderingContext | null> {
         ui.reportError('WebGL is not supported.');
         return null;
     }
+
+    loadShaders(gl);
 
     // configure viewport
     resizeCanvas(canvas);

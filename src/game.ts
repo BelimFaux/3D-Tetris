@@ -6,14 +6,15 @@ import { MouseHandler } from './input/mouse.js';
 import { CollisionEvent } from './objects/collision.js';
 import { Grid } from './objects/grid.js';
 import { Tetracube, TetracubeType } from './objects/tetracube.js';
-import { Shader } from './shader.js';
+import { getShader } from './shader.js';
 import { DIM } from './utils/constants.js';
-import { getFile } from './utils/files.js';
+import { Slider } from './input/slider.js';
 
 interface GameOptions {
     gravity: boolean;
     showGrid: boolean;
     perspective: boolean;
+    gouraud: boolean;
 }
 
 function defaultOptions(): GameOptions {
@@ -21,6 +22,7 @@ function defaultOptions(): GameOptions {
         gravity: false,
         showGrid: false,
         perspective: false,
+        gouraud: false,
     };
 }
 
@@ -30,6 +32,7 @@ export class Game {
     camera;
 
     shader;
+    sliders;
 
     nextPiece: TetracubeType;
     activePiece: Tetracube;
@@ -43,21 +46,20 @@ export class Game {
         this.options = defaultOptions();
         this.camera = new Camera();
 
-        this.shader = new Shader(gl)
-            .addShader(getFile('shaders/default.vert'), gl.VERTEX_SHADER)
-            .addShader(getFile('shaders/default.frag'), gl.FRAGMENT_SHADER)
-            .link();
+        this.shader = getShader('gouraud');
+        ui.updateShader('gouraud');
+        this.sliders = new Slider();
 
         this.grid = new Grid();
         this.grid.initVao(gl, this.shader);
-        this.nextPiece = Math.floor(Math.random() * 7 + 1);
+        this.nextPiece = Math.floor(Math.random() * 7);
         this.activePiece = new Tetracube(
             [0, DIM.max[1], 0],
             this.nextPiece,
             this,
         );
         this.activePiece.initVaos(gl, this.shader);
-        this.nextPiece = Math.floor(Math.random() * 7 + 1);
+        this.nextPiece = Math.floor(Math.random() * 7);
         ui.updateNextPiece(this.nextPiece);
 
         this.movePiecesBy = 0;
@@ -75,7 +77,7 @@ export class Game {
             this,
         );
         this.activePiece.initVaos(this.gl, this.shader);
-        this.nextPiece = Math.floor(Math.random() * 7 + 1);
+        this.nextPiece = Math.floor(Math.random() * 7);
         ui.updateNextPiece(this.nextPiece);
     }
 
@@ -95,6 +97,17 @@ export class Game {
         const persp = (this.options.perspective = !this.options.perspective);
         if (persp) this.camera.initPerspective();
         else this.camera.initOrthogonal();
+    }
+
+    toggleShader() {
+        const gouraud = (this.options.gouraud = !this.options.gouraud);
+        if (gouraud) this.shader = getShader('gouraud');
+        else this.shader = getShader('phong');
+        ui.updateShader(gouraud ? 'gouraud' : 'phong');
+
+        this.activePiece.initVaos(this.gl, this.shader);
+        this.grid.initVao(this.gl, this.shader);
+        this.pieces.forEach((piece) => piece.initVaos(this.gl, this.shader));
     }
 
     adjustScore(killed: number) {
@@ -161,6 +174,7 @@ export class Game {
         this.pieces.forEach((piece) => {
             piece.removeY(yVal);
         });
+        console.log(`Deleted ${yVal}y xz-plane`);
     }
 
     testFullCols() {
@@ -192,6 +206,9 @@ export class Game {
         const viewMatrix = this.camera.getView();
 
         this.shader.projMatrix(this.gl, this.camera.getProjection());
+        this.gl.uniform3fv(this.shader.locUEye, this.camera.getEye());
+
+        this.shader.initCoefficients(this.sliders);
         this.activePiece.draw(this.gl, this.shader, viewMatrix);
 
         if (this.options.showGrid) {

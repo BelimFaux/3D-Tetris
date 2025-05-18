@@ -1,6 +1,7 @@
 import * as glm from '../gl-matrix/index.js';
 
 import type { Game } from '../game.js';
+import { TetracubeType } from '../objects/tetracube.js';
 
 export class KeyboardHandler {
     keySet: Set<string>;
@@ -47,6 +48,9 @@ export class KeyboardHandler {
         if (this.keySet.has('p')) this.game.toggleGravity();
 
         if (this.keySet.has(' ')) this.game.dropActive();
+
+        if (this.keySet.has('.') && this.keySet.has(','))
+            this.game.nextPiece = TetracubeType.IPIECE;
     }
 
     private viewHandler() {
@@ -75,5 +79,7 @@ export class KeyboardHandler {
         if (this.keySet.has('-')) this.game.camera.zoomOut();
 
         if (this.keySet.has('g')) this.game.toggleGrid();
+
+        if (this.keySet.has('f')) this.game.toggleShader();
     }
 }

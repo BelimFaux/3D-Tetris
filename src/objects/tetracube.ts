@@ -233,7 +233,7 @@ export class Tetracube {
         const transform = this.getTransform();
         this.cubes = this.cubes.filter((cube) => {
             const cubePos = cube.getCoord(transform);
-            return cubePos[1] != yVal;
+            return Math.abs(cubePos[1] - yVal) >= 0.001;
         });
     }
 
