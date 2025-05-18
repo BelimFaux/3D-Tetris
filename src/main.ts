@@ -3,12 +3,16 @@ import { loadFile } from './utils/files.js';
 import { resizeCanvas } from './utils/webgl.js';
 import { Game } from './game.js';
 import { loadShaders } from './shader.js';
+import { parseObjData } from './objects/cube.js';
 
 async function setup(): Promise<WebGL2RenderingContext | null> {
     await loadFile('shaders/gouraud.frag');
     await loadFile('shaders/gouraud.vert');
     await loadFile('shaders/phong.frag');
     await loadFile('shaders/phong.vert');
+
+    await loadFile('ressources/cube.obj');
+    parseObjData();
 
     // get the canvas object and handle null
     const canvas = document.getElementById(

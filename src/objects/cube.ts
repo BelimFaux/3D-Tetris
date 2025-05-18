@@ -1,91 +1,15 @@
 import * as glm from '../gl-matrix/index.js';
 import type { Shader } from '../shader.js';
 import { DIM } from '../utils/constants.js';
+import { getFile } from '../utils/files.js';
+import { ObjParser, type ObjData } from './objparser.js';
 
-const vertices = new Float32Array(
-    [
-        // Front face
-        [-0.5, -0.5, 0.5],
-        [0.5, -0.5, 0.5],
-        [0.5, 0.5, 0.5],
-        [-0.5, 0.5, 0.5],
-        // Back face
-        [-0.5, -0.5, -0.5],
-        [-0.5, 0.5, -0.5],
-        [0.5, 0.5, -0.5],
-        [0.5, -0.5, -0.5],
-        // Top face
-        [-0.5, 0.5, -0.5],
-        [-0.5, 0.5, 0.5],
-        [0.5, 0.5, 0.5],
-        [0.5, 0.5, -0.5],
-        // Bottom face
-        [-0.5, -0.5, -0.5],
-        [0.5, -0.5, -0.5],
-        [0.5, -0.5, 0.5],
-        [-0.5, -0.5, 0.5],
-        // Right face
-        [0.5, -0.5, -0.5],
-        [0.5, 0.5, -0.5],
-        [0.5, 0.5, 0.5],
-        [0.5, -0.5, 0.5],
-        // Left face
-        [-0.5, -0.5, -0.5],
-        [-0.5, -0.5, 0.5],
-        [-0.5, 0.5, 0.5],
-        [-0.5, 0.5, -0.5],
-    ].flat(),
-);
+let cubeData: ObjData;
 
-const normals = new Float32Array(
-    [
-        // Front face
-        [0.0, 0.0, 1.0],
-        [0.0, 0.0, 1.0],
-        [0.0, 0.0, 1.0],
-        [0.0, 0.0, 1.0],
-        // Back face
-        [0.0, 0.0, -1.0],
-        [0.0, 0.0, -1.0],
-        [0.0, 0.0, -1.0],
-        [0.0, 0.0, -1.0],
-        // Top face
-        [0.0, 1.0, 0.0],
-        [0.0, 1.0, 0.0],
-        [0.0, 1.0, 0.0],
-        [0.0, 1.0, 0.0],
-        // Bottom face
-        [0.0, -1.0, 0.0],
-        [0.0, -1.0, 0.0],
-        [0.0, -1.0, 0.0],
-        [0.0, -1.0, 0.0],
-        // Right face
-        [1.0, 0.0, 0.0],
-        [1.0, 0.0, 0.0],
-        [1.0, 0.0, 0.0],
-        [1.0, 0.0, 0.0],
-        // Left face
-        [-1.0, 0.0, 0.0],
-        [-1.0, 0.0, 0.0],
-        [-1.0, 0.0, 0.0],
-        [-1.0, 0.0, 0.0],
-    ].flat(),
-);
-
-const indices = new Uint16Array([
-    // front
-    0, 1, 2, 0, 2, 3,
-    // back
-    4, 5, 6, 4, 6, 7,
-    // top
-    8, 9, 10, 8, 10, 11,
-    // bottom
-    12, 13, 14, 12, 14, 15,
-    // right
-    16, 17, 18, 16, 18, 19,
-    // left
-    20, 21, 22, 20, 22, 23,
-]);
+export function parseObjData() {
+    const parser = new ObjParser();
+    cubeData = parser.parse(getFile('ressources/cube.obj'));
+}
 
 /**
  * Creates a Cube Shape
@@ -95,7 +19,7 @@ const indices = new Uint16Array([
 export function getRandomColors(): Float32Array {
     // generate random colors for each face
     const color = [Math.random(), Math.random(), Math.random(), 1];
-    return new Float32Array(Array(vertices.length).fill(color).flat());
+    return new Float32Array(Array(cubeData.vertices.length).fill(color).flat());
 }
 
 export class Cube {
@@ -107,9 +31,9 @@ export class Cube {
     vaoIndex: WebGLVertexArrayObject = -1;
 
     constructor(displace: vec3, colors: Float32Array = getRandomColors()) {
-        this.vertices = vertices;
-        this.indices = indices;
-        this.normals = normals;
+        this.vertices = cubeData.vertices;
+        this.indices = cubeData.indices;
+        this.normals = cubeData.normals;
         this.colors = colors;
         this.displace = displace;
     }
