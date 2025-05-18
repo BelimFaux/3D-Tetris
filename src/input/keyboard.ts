@@ -49,6 +49,8 @@ export class KeyboardHandler {
 
         if (this.keySet.has(' ')) this.game.dropActive();
 
+        if (this.keySet.has('b')) this.game.toggleCylinders();
+
         if (this.keySet.has('.') && this.keySet.has(','))
             this.game.nextPiece = TetracubeType.IPIECE;
     }

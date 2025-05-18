@@ -4,7 +4,7 @@ import * as glm from '../gl-matrix/index.js';
 import type { Shader } from '../shader';
 import { AXIS, DIM } from '../utils/constants.js';
 import { CollisionEvent, collisionTest } from './collision.js';
-import { Cube, getRandomColors } from './cube.js';
+import { Cube, getRandomColor } from './cube.js';
 
 export enum TetracubeType {
     IPIECE,
@@ -18,7 +18,7 @@ export enum TetracubeType {
 }
 
 function buildIPiece(): Array<Cube> {
-    const colors = getRandomColors();
+    const colors = getRandomColor();
     return [
         new Cube([-2, 0, 0], colors),
         new Cube([-1, 0, 0], colors),
@@ -28,7 +28,7 @@ function buildIPiece(): Array<Cube> {
 }
 
 function buildOPiece(): Array<Cube> {
-    const colors = getRandomColors();
+    const colors = getRandomColor();
     return [
         new Cube([0, 0, 0], colors),
         new Cube([0, 1, 0], colors),
@@ -38,7 +38,7 @@ function buildOPiece(): Array<Cube> {
 }
 
 function buildLPiece(): Array<Cube> {
-    const colors = getRandomColors();
+    const colors = getRandomColor();
     return [
         new Cube([-1, 0, 0], colors),
         new Cube([0, 0, 0], colors),
@@ -48,7 +48,7 @@ function buildLPiece(): Array<Cube> {
 }
 
 function buildTPiece(): Array<Cube> {
-    const colors = getRandomColors();
+    const colors = getRandomColor();
     return [
         new Cube([-1, 0, 0], colors),
         new Cube([0, 0, 0], colors),
@@ -58,7 +58,7 @@ function buildTPiece(): Array<Cube> {
 }
 
 function buildNPiece(): Array<Cube> {
-    const colors = getRandomColors();
+    const colors = getRandomColor();
     return [
         new Cube([-1, 0, 0], colors),
         new Cube([0, 0, 0], colors),
@@ -68,7 +68,7 @@ function buildNPiece(): Array<Cube> {
 }
 
 function buildTowerRight(): Array<Cube> {
-    const colors = getRandomColors();
+    const colors = getRandomColor();
     return [
         new Cube([0, 0, 0], colors),
         new Cube([1, 0, 0], colors),
@@ -78,7 +78,7 @@ function buildTowerRight(): Array<Cube> {
 }
 
 function buildTowerLeft(): Array<Cube> {
-    const colors = getRandomColors();
+    const colors = getRandomColor();
     return [
         new Cube([0, 0, 0], colors),
         new Cube([1, 0, 0], colors),
@@ -88,7 +88,7 @@ function buildTowerLeft(): Array<Cube> {
 }
 
 function buildTripod(): Array<Cube> {
-    const colors = getRandomColors();
+    const colors = getRandomColor();
     return [
         new Cube([0, 0, 0], colors),
         new Cube([-1, 0, 0], colors),
@@ -284,10 +284,21 @@ export class Tetracube {
         return transformMatrix;
     }
 
-    draw(gl: WebGL2RenderingContext, shader: Shader, viewMatrix: mat4) {
+    drawCubes(gl: WebGL2RenderingContext, shader: Shader, viewMatrix: mat4) {
         const transformMatrix = this.getTransform();
         this.cubes.forEach((cube) => {
-            cube.draw(gl, shader, viewMatrix, transformMatrix);
+            cube.drawCube(gl, shader, viewMatrix, transformMatrix);
+        });
+    }
+
+    drawCylinders(
+        gl: WebGL2RenderingContext,
+        shader: Shader,
+        viewMatrix: mat4,
+    ) {
+        const transformMatrix = this.getTransform();
+        this.cubes.forEach((cube) => {
+            cube.drawCylinder(gl, shader, viewMatrix, transformMatrix);
         });
     }
 }

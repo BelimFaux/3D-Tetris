@@ -6,7 +6,6 @@ export interface ObjData {
     normals: Float32Array;
     indices: Uint16Array;
 }
-
 /**
  * Class to parse .obj files to data that can be used to construct objects
  */

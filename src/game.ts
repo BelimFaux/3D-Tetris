@@ -15,6 +15,7 @@ interface GameOptions {
     showGrid: boolean;
     perspective: boolean;
     gouraud: boolean;
+    cylinders: boolean;
 }
 
 function defaultOptions(): GameOptions {
@@ -23,6 +24,7 @@ function defaultOptions(): GameOptions {
         showGrid: false,
         perspective: false,
         gouraud: false,
+        cylinders: false,
     };
 }
 
@@ -91,6 +93,10 @@ export class Game {
 
     toggleGrid() {
         this.options.showGrid = !this.options.showGrid;
+    }
+
+    toggleCylinders() {
+        this.options.cylinders = !this.options.cylinders;
     }
 
     togglePerspective() {
@@ -209,17 +215,24 @@ export class Game {
         this.gl.uniform3fv(this.shader.locUEye, this.camera.getEye());
 
         this.shader.initCoefficients(this.sliders);
-        this.activePiece.draw(this.gl, this.shader, viewMatrix);
+
+        if (this.options.cylinders) {
+            this.activePiece.drawCylinders(this.gl, this.shader, viewMatrix);
+            this.pieces.forEach((piece) => {
+                piece.drawCylinders(this.gl, this.shader, viewMatrix);
+            });
+        } else {
+            this.activePiece.drawCubes(this.gl, this.shader, viewMatrix);
+            this.pieces.forEach((piece) => {
+                piece.drawCubes(this.gl, this.shader, viewMatrix);
+            });
+        }
 
         if (this.options.showGrid) {
             this.grid.draw(this.gl, this.shader, viewMatrix);
         } else {
             this.grid.maybeDraw(this.gl, this.shader, this.camera);
         }
-
-        this.pieces.forEach((piece) => {
-            piece.draw(this.gl, this.shader, viewMatrix);
-        });
     }
 
     tick(deltaTime: number) {

@@ -12,6 +12,7 @@ async function setup(): Promise<WebGL2RenderingContext | null> {
     await loadFile('shaders/phong.vert');
 
     await loadFile('ressources/cube.obj');
+    await loadFile('ressources/cylinder.obj');
     parseObjData();
 
     // get the canvas object and handle null

@@ -5,66 +5,73 @@ import { getFile } from '../utils/files.js';
 import { ObjParser, type ObjData } from './objparser.js';
 
 let cubeData: ObjData;
+let cylinderData: ObjData;
 
 export function parseObjData() {
     const parser = new ObjParser();
     cubeData = parser.parse(getFile('ressources/cube.obj'));
+    cylinderData = parser.parse(getFile('ressources/cylinder.obj'));
 }
 
-/**
- * Creates a Cube Shape
- *
- * @returns {Cube} the resulting cube
- */
-export function getRandomColors(): Float32Array {
-    // generate random colors for each face
-    const color = [Math.random(), Math.random(), Math.random(), 1];
-    return new Float32Array(Array(cubeData.vertices.length).fill(color).flat());
+export function getRandomColor(): vec4 {
+    return [Math.random(), Math.random(), Math.random(), 1];
 }
 
 export class Cube {
-    vertices;
-    indices;
-    normals;
-    colors;
+    cubeData;
+    cylinderData;
+    color;
     displace;
-    vaoIndex: WebGLVertexArrayObject = -1;
+    cubeVaoIndex: WebGLVertexArrayObject = -1;
+    cylinderVaoIndex: WebGLVertexArrayObject = -1;
 
-    constructor(displace: vec3, colors: Float32Array = getRandomColors()) {
-        this.vertices = cubeData.vertices;
-        this.indices = cubeData.indices;
-        this.normals = cubeData.normals;
-        this.colors = colors;
+    constructor(displace: vec3, color: vec4 = getRandomColor()) {
+        this.cubeData = cubeData;
+        this.cylinderData = cylinderData;
+        this.color = color;
         this.displace = displace;
     }
 
-    initVao(gl: WebGL2RenderingContext, shader: Shader) {
-        this.vaoIndex = gl.createVertexArray();
-        gl.bindVertexArray(this.vaoIndex);
+    initVaoFrom(
+        gl: WebGL2RenderingContext,
+        shader: Shader,
+        data: ObjData,
+    ): WebGLVertexArrayObject {
+        const vaoIndex = gl.createVertexArray();
+        gl.bindVertexArray(vaoIndex);
 
         shader.bind();
 
         const vertexBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, this.vertices, gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, data.vertices, gl.STATIC_DRAW);
         gl.enableVertexAttribArray(shader.locACoord);
         gl.vertexAttribPointer(shader.locACoord, 3, gl.FLOAT, false, 0, 0);
 
         const indexBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indices, gl.STATIC_DRAW);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, data.indices, gl.STATIC_DRAW);
 
         const normalBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, this.normals, gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, data.normals, gl.STATIC_DRAW);
         gl.enableVertexAttribArray(shader.locANormal);
         gl.vertexAttribPointer(shader.locANormal, 3, gl.FLOAT, false, 0, 0);
 
         const colorBuffer = gl.createBuffer();
+        const colors = new Float32Array(
+            Array(data.vertices.length).fill(this.color).flat(),
+        );
         gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, this.colors, gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW);
         gl.enableVertexAttribArray(shader.locAColor);
         gl.vertexAttribPointer(shader.locAColor, 4, gl.FLOAT, false, 0, 0);
+        return vaoIndex;
+    }
+
+    initVao(gl: WebGL2RenderingContext, shader: Shader) {
+        this.cubeVaoIndex = this.initVaoFrom(gl, shader, this.cubeData);
+        this.cylinderVaoIndex = this.initVaoFrom(gl, shader, this.cylinderData);
     }
 
     getCoord(transform: mat4): vec3 {
@@ -100,17 +107,33 @@ export class Cube {
         }
     }
 
-    draw(
+    drawCylinder(
         gl: WebGL2RenderingContext,
         shader: Shader,
         viewMatrix: mat4,
         parentTransform: mat4,
     ) {
         this.update(gl, shader, viewMatrix, parentTransform);
-        gl.bindVertexArray(this.vaoIndex);
+        gl.bindVertexArray(this.cylinderVaoIndex);
         gl.drawElements(
             gl.TRIANGLES,
-            this.indices.length,
+            this.cylinderData.indices.length,
+            gl.UNSIGNED_SHORT,
+            0,
+        );
+    }
+
+    drawCube(
+        gl: WebGL2RenderingContext,
+        shader: Shader,
+        viewMatrix: mat4,
+        parentTransform: mat4,
+    ) {
+        this.update(gl, shader, viewMatrix, parentTransform);
+        gl.bindVertexArray(this.cubeVaoIndex);
+        gl.drawElements(
+            gl.TRIANGLES,
+            this.cubeData.indices.length,
             gl.UNSIGNED_SHORT,
             0,
         );
