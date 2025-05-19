@@ -17,6 +17,7 @@ async function setup(): Promise<WebGL2RenderingContext | null> {
     parseObjData();
 
     addImage('ressources/cubeTexture.webp');
+    addImage('ressources/cylinderTexture.webp');
 
     // get the canvas object and handle null
     const canvas = document.getElementById(

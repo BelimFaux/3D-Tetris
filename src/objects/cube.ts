@@ -11,6 +11,8 @@ export function parseObjData() {
     const parser = new ObjParser();
     cubeData = parser.parse(getFile('ressources/cube.obj'));
     cylinderData = parser.parse(getFile('ressources/cylinder.obj'));
+    console.log(cubeData);
+    console.log(cylinderData);
 }
 
 export function getRandomColor(): vec4 {
@@ -22,7 +24,6 @@ export class Cube {
     cylinderData;
     color;
     displace;
-    texture: WebGLTexture = -1;
     textured: boolean = false;
     cubeVaoIndex: WebGLVertexArrayObject = -1;
     cylinderVaoIndex: WebGLVertexArrayObject = -1;
@@ -82,7 +83,6 @@ export class Cube {
                 0,
                 0,
             );
-            this.texture = getTexture('ressources/cubeTexture.webp');
         }
 
         return vaoIndex;
@@ -133,6 +133,15 @@ export class Cube {
         parentTransform: mat4,
     ) {
         this.update(gl, shader, viewMatrix, parentTransform);
+        if (this.textured) {
+            gl.activeTexture(gl.TEXTURE0);
+            gl.bindTexture(
+                gl.TEXTURE_2D,
+                getTexture('ressources/cylinderTexture.webp'),
+            );
+            gl.uniform1i(shader.locUTexture, 0);
+            gl.uniform1i(shader.locUIsTextured, 1);
+        }
         gl.bindVertexArray(this.cylinderVaoIndex);
         gl.drawElements(
             gl.TRIANGLES,
@@ -140,6 +149,7 @@ export class Cube {
             gl.UNSIGNED_SHORT,
             0,
         );
+        gl.uniform1i(shader.locUIsTextured, 0);
     }
 
     drawCube(
@@ -150,8 +160,12 @@ export class Cube {
     ) {
         this.update(gl, shader, viewMatrix, parentTransform);
         if (this.textured) {
-            gl.bindTexture(gl.TEXTURE_2D, this.texture);
-            gl.uniform1i(shader.locUTexture, 0);
+            gl.activeTexture(gl.TEXTURE1);
+            gl.bindTexture(
+                gl.TEXTURE_2D,
+                getTexture('ressources/cubeTexture.webp'),
+            );
+            gl.uniform1i(shader.locUTexture, 1);
             gl.uniform1i(shader.locUIsTextured, 1);
         }
         gl.bindVertexArray(this.cubeVaoIndex);

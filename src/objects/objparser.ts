@@ -7,6 +7,19 @@ export interface ObjData {
     texturecoords: Float32Array;
     indices: Uint16Array;
 }
+
+interface Vertex {
+    v: number;
+    vt: number;
+    vn: number;
+}
+
+interface Face {
+    v1: Vertex;
+    v2: Vertex;
+    v3: Vertex;
+}
+
 /**
  * Class to parse .obj files to data that can be used to construct objects
  */
@@ -17,6 +30,7 @@ export class ObjParser {
     normalIndices: Array<number> = [];
     texturecoords: Array<Array<number>> = [];
     textureIndices: Array<number> = [];
+    faces: Array<Face> = [];
     currentLine = 0;
 
     constructor() {}
@@ -33,30 +47,34 @@ export class ObjParser {
         this.vertexIndices = [];
         this.normalIndices = [];
         this.textureIndices = [];
+        this.faces = [];
         this.currentLine = 0;
 
         const lines = file.split('\n');
 
-        lines.forEach((line: string) => {
-            this.parseLine(line);
-            this.currentLine++;
-        });
-
-        let vertices = [];
-        let normals = [];
-        let texturecoords = [];
-        let indices = [];
-
-        for (let i = 0; i < this.vertexIndices.length; i++) {
-            const vInd = this.vertexIndices[i] as number;
-            const nInd = this.normalIndices[i] as number;
-            const tInd = this.textureIndices[i] as number;
-
-            vertices.push(this.vertices[vInd] as Array<number>);
-            normals.push(this.normals[nInd] as Array<number>);
-            texturecoords.push(this.texturecoords[tInd] as Array<number>);
-            indices.push(i);
+        for (; this.currentLine < lines.length; this.currentLine++) {
+            this.parseLine(lines[this.currentLine] as string);
         }
+
+        let vertices: Array<Array<number>> = [];
+        let normals: Array<Array<number>> = [];
+        let texturecoords: Array<Array<number>> = [];
+        let indices: Array<number> = [];
+
+        let i = 0;
+        const emitVertex = (vertex: Vertex) => {
+            vertices.push(this.vertices[vertex.v] as Array<number>);
+            normals.push(this.normals[vertex.vn] as Array<number>);
+            texturecoords.push(this.texturecoords[vertex.vt] as Array<number>);
+            indices.push(i);
+            i++;
+        };
+
+        this.faces.forEach((face) => {
+            emitVertex(face.v1);
+            emitVertex(face.v2);
+            emitVertex(face.v3);
+        });
 
         return {
             vertices: new Float32Array(vertices.flat()),
@@ -135,12 +153,22 @@ export class ObjParser {
                 if (len != 4) {
                     this.error(`Expected 4 Elements but found ${len}`);
                 }
+                const vertices: Array<Vertex> = [];
                 words.forEach((data) => {
                     const [ind, tex, normal] = this.parseFace(data);
-                    this.vertexIndices.push(ind - 1);
-                    this.textureIndices.push((tex || 1) - 1);
-                    this.normalIndices.push((normal || 1) - 1);
+                    const vertex = {
+                        v: ind - 1,
+                        vt: (tex || 1) - 1,
+                        vn: (normal || 1) - 1,
+                    };
+                    vertices.push(vertex);
                 });
+                const face = {
+                    v1: vertices[0] as Vertex,
+                    v2: vertices[1] as Vertex,
+                    v3: vertices[2] as Vertex,
+                };
+                this.faces.push(face);
                 break;
         }
     }
