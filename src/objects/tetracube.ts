@@ -128,8 +128,14 @@ export class Tetracube {
     rotation;
     game;
 
-    constructor(initialPos: vec3, type: TetracubeType, game: Game) {
+    constructor(
+        initialPos: vec3,
+        type: TetracubeType,
+        game: Game,
+        textured: boolean,
+    ) {
         this.cubes = buildCubeList(type);
+        this.cubes.forEach((cube) => (cube.textured = textured));
         this.position = initialPos;
         this.translation = glm.mat4.create();
         this.rotation = glm.mat4.create();

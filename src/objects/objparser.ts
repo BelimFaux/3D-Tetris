@@ -4,6 +4,7 @@
 export interface ObjData {
     vertices: Float32Array;
     normals: Float32Array;
+    texturecoords: Float32Array;
     indices: Uint16Array;
 }
 /**
@@ -14,6 +15,8 @@ export class ObjParser {
     vertexIndices: Array<number> = [];
     normals: Array<Array<number>> = [];
     normalIndices: Array<number> = [];
+    texturecoords: Array<Array<number>> = [];
+    textureIndices: Array<number> = [];
     currentLine = 0;
 
     constructor() {}
@@ -29,30 +32,36 @@ export class ObjParser {
         this.normals = [];
         this.vertexIndices = [];
         this.normalIndices = [];
+        this.textureIndices = [];
         this.currentLine = 0;
 
         const lines = file.split('\n');
 
         lines.forEach((line: string) => {
             this.parseLine(line);
+            this.currentLine++;
         });
 
         let vertices = [];
         let normals = [];
+        let texturecoords = [];
         let indices = [];
 
         for (let i = 0; i < this.vertexIndices.length; i++) {
             const vInd = this.vertexIndices[i] as number;
             const nInd = this.normalIndices[i] as number;
+            const tInd = this.textureIndices[i] as number;
 
             vertices.push(this.vertices[vInd] as Array<number>);
             normals.push(this.normals[nInd] as Array<number>);
+            texturecoords.push(this.texturecoords[tInd] as Array<number>);
             indices.push(i);
         }
 
         return {
             vertices: new Float32Array(vertices.flat()),
             normals: new Float32Array(normals.flat()),
+            texturecoords: new Float32Array(texturecoords.flat()),
             indices: new Uint16Array(indices),
         };
     }
@@ -93,6 +102,8 @@ export class ObjParser {
                     (vertex[1] as number) /= w;
                     (vertex[2] as number) /= w;
                 }
+                if (vertex.length != 3)
+                    this.error(`Vertex has more than 3 points`);
                 this.vertices.push(vertex);
                 break;
             case 'vn':
@@ -103,15 +114,30 @@ export class ObjParser {
                 words.forEach((data) => {
                     normal.push(parseFloat(data));
                 });
+                if (normal.length != 3)
+                    this.error(`Normal has more than 3 points`);
                 this.normals.push(normal);
+                break;
+            case 'vt':
+                if (len != 3) {
+                    this.error(`Expected 3 Elements but found ${len}`);
+                }
+                let coords: Array<number> = [];
+                words.forEach((data) => {
+                    coords.push(parseFloat(data));
+                });
+                if (coords.length != 2)
+                    this.error(`Texturecoord has more than 2 points`);
+                this.texturecoords.push(coords);
                 break;
             case 'f':
                 if (len != 4) {
                     this.error(`Expected 4 Elements but found ${len}`);
                 }
                 words.forEach((data) => {
-                    const [ind, _tex, normal] = this.parseFace(data);
+                    const [ind, tex, normal] = this.parseFace(data);
                     this.vertexIndices.push(ind - 1);
+                    this.textureIndices.push((tex || 1) - 1);
                     this.normalIndices.push((normal || 1) - 1);
                 });
                 break;

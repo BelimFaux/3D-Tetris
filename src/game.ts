@@ -59,6 +59,7 @@ export class Game {
             [0, DIM.max[1], 0],
             this.nextPiece,
             this,
+            false,
         );
         this.activePiece.initVaos(gl, this.shader);
         this.nextPiece = Math.floor(Math.random() * 7);
@@ -73,10 +74,12 @@ export class Game {
     }
 
     private spawnNewPiece() {
+        const textured = Math.random() <= 0.1;
         this.activePiece = new Tetracube(
             [0, DIM.max[1], 0],
             this.nextPiece,
             this,
+            textured,
         );
         this.activePiece.initVaos(this.gl, this.shader);
         this.nextPiece = Math.floor(Math.random() * 7);

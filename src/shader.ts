@@ -15,10 +15,13 @@ export class Shader {
     locACoord = -1;
     locAColor = -1;
     locANormal = -1;
+    locATexcoord = -1;
     locUTransform: WebGLUniformLocation = -1;
     locUProjection: WebGLUniformLocation = -1;
     locUEye: WebGLUniformLocation = -1;
     locUNormal: WebGLUniformLocation = -1;
+    locUTexture: WebGLUniformLocation = -1;
+    locUIsTextured: WebGLUniformLocation = -1;
     locUAmbient: WebGLUniformLocation = -1;
     locUDiffuse: WebGLUniformLocation = -1;
     locUSpecular: WebGLUniformLocation = -1;
@@ -78,6 +81,10 @@ export class Shader {
         this.locACoord = this.gl.getAttribLocation(this.program, 'a_coords');
         this.locAColor = this.gl.getAttribLocation(this.program, 'a_color');
         this.locANormal = this.gl.getAttribLocation(this.program, 'a_normal');
+        this.locATexcoord = this.gl.getAttribLocation(
+            this.program,
+            'a_texture',
+        );
 
         this.locUTransform =
             this.gl.getUniformLocation(this.program, 'u_modelview') || -1;
@@ -89,6 +96,12 @@ export class Shader {
 
         this.locUNormal =
             this.gl.getUniformLocation(this.program, 'u_normal') || -1;
+
+        this.locUTexture =
+            this.gl.getUniformLocation(this.program, 'u_texture') || -1;
+
+        this.locUIsTextured =
+            this.gl.getUniformLocation(this.program, 'u_istextured') || -1;
 
         this.locUAmbient =
             this.gl.getUniformLocation(this.program, 'u_ambientCoefficient') ||

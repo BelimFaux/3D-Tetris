@@ -3,6 +3,7 @@ precision mediump float;
 attribute vec3 a_color;
 attribute vec3 a_coords;
 attribute vec3 a_normal;
+attribute vec2 a_texture;
 
 uniform vec3 u_eye;
 uniform mat4 u_modelview;
@@ -10,6 +11,7 @@ uniform mat4 u_projection;
 uniform mat3 u_normal;
 
 varying vec4 v_vertexColor;
+varying vec2 v_texcoord;
 varying vec3 v_normal;
 varying vec3 v_light;
 varying vec3 v_eye;
@@ -26,6 +28,7 @@ void main() {
 
     v_eye = normalize(u_eye - viewPosition.xyz); // Eye vector
     v_vertexColor = vec4(a_color, 1.0);
+    v_texcoord = a_texture;
 
     gl_Position = u_projection * viewPosition;
 }

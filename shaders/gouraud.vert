@@ -3,6 +3,7 @@ precision mediump float;
 attribute vec3 a_color;
 attribute vec3 a_coords;
 attribute vec3 a_normal;
+attribute vec2 a_texture;
 
 uniform vec3 u_eye;
 uniform mat4 u_modelview;
@@ -14,6 +15,7 @@ uniform float u_diffuseCoefficient;
 uniform float u_specularCoefficient;
 
 varying vec4 v_vertexColor;
+varying vec2 v_texcoord;
 
 const vec3 lightDir = vec3(-1, -1, -1);
 
@@ -39,6 +41,7 @@ void main() {
     // combine all components for the final color, that gets interpolated
     vec3 finalColor = ambientColor + diffuseColor + specularColor;
     v_vertexColor = vec4(finalColor, 1.0);
+    v_texcoord = a_texture;
 
     if (a_normal == vec3(0, 0, 0))
         v_vertexColor = vec4(a_color, 1.0);

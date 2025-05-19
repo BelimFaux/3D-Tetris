@@ -1,5 +1,5 @@
 import * as ui from './ui.js';
-import { loadFile } from './utils/files.js';
+import { addImage, loadAllTextures, loadFile } from './utils/files.js';
 import { resizeCanvas } from './utils/webgl.js';
 import { Game } from './game.js';
 import { loadShaders } from './shader.js';
@@ -12,8 +12,11 @@ async function setup(): Promise<WebGL2RenderingContext | null> {
     await loadFile('shaders/phong.vert');
 
     await loadFile('ressources/cube.obj');
+    await loadFile('ressources/cube.obj');
     await loadFile('ressources/cylinder.obj');
     parseObjData();
+
+    addImage('ressources/cubeTexture.webp');
 
     // get the canvas object and handle null
     const canvas = document.getElementById(
@@ -32,6 +35,7 @@ async function setup(): Promise<WebGL2RenderingContext | null> {
     }
 
     loadShaders(gl);
+    await loadAllTextures(gl);
 
     // configure viewport
     resizeCanvas(canvas);

@@ -1,7 +1,7 @@
 import * as glm from '../gl-matrix/index.js';
 import type { Shader } from '../shader.js';
 import { DIM } from '../utils/constants.js';
-import { getFile } from '../utils/files.js';
+import { getFile, getTexture } from '../utils/files.js';
 import { ObjParser, type ObjData } from './objparser.js';
 
 let cubeData: ObjData;
@@ -22,6 +22,8 @@ export class Cube {
     cylinderData;
     color;
     displace;
+    texture: WebGLTexture = -1;
+    textured: boolean = false;
     cubeVaoIndex: WebGLVertexArrayObject = -1;
     cylinderVaoIndex: WebGLVertexArrayObject = -1;
 
@@ -66,6 +68,23 @@ export class Cube {
         gl.bufferData(gl.ARRAY_BUFFER, colors, gl.STATIC_DRAW);
         gl.enableVertexAttribArray(shader.locAColor);
         gl.vertexAttribPointer(shader.locAColor, 4, gl.FLOAT, false, 0, 0);
+
+        if (this.textured) {
+            const texBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, texBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, data.texturecoords, gl.STATIC_DRAW);
+            gl.enableVertexAttribArray(shader.locATexcoord);
+            gl.vertexAttribPointer(
+                shader.locATexcoord,
+                2,
+                gl.FLOAT,
+                false,
+                0,
+                0,
+            );
+            this.texture = getTexture('ressources/cubeTexture.webp');
+        }
+
         return vaoIndex;
     }
 
@@ -130,6 +149,11 @@ export class Cube {
         parentTransform: mat4,
     ) {
         this.update(gl, shader, viewMatrix, parentTransform);
+        if (this.textured) {
+            gl.bindTexture(gl.TEXTURE_2D, this.texture);
+            gl.uniform1i(shader.locUTexture, 0);
+            gl.uniform1i(shader.locUIsTextured, 1);
+        }
         gl.bindVertexArray(this.cubeVaoIndex);
         gl.drawElements(
             gl.TRIANGLES,
@@ -137,5 +161,6 @@ export class Cube {
             gl.UNSIGNED_SHORT,
             0,
         );
+        gl.uniform1i(shader.locUIsTextured, 0);
     }
 }
