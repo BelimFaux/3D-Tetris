@@ -126,6 +126,7 @@ export class ObjParser {
                 words.forEach((data) => {
                     coords.push(parseFloat(data));
                 });
+                coords[1] = 1.0 - (coords[1] as number); // webgl flips the v-axis of textures for some reason
                 if (coords.length != 2)
                     this.error(`Texturecoord has more than 2 points`);
                 this.texturecoords.push(coords);

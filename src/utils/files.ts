@@ -1,4 +1,5 @@
 import * as ui from './../ui.js';
+import { createTexture } from './webgl.js';
 
 const filesMap: Map<string, string> = new Map();
 const textureMap: Map<string, WebGLTexture> = new Map();
@@ -57,17 +58,7 @@ export async function loadAllTextures(
 ): Promise<void> {
     await Promise.all(imagePromises);
     imageMap.forEach((img, path) => {
-        const texture = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, texture);
-        gl.texImage2D(
-            gl.TEXTURE_2D,
-            0,
-            gl.RGBA,
-            gl.RGBA,
-            gl.UNSIGNED_BYTE,
-            img,
-        );
-        gl.generateMipmap(gl.TEXTURE_2D);
+        const texture = createTexture(gl, img);
         textureMap.set(path, texture);
     });
 }
