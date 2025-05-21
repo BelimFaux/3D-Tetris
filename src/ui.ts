@@ -85,7 +85,7 @@ function setPopUp(visibility: string): void {
 
 export function openPopUp(finalScore: number): void {
     setPopUp('visible');
-    setValue('finalScore', finalScore);
+    setValue('finalScoreVal', finalScore);
 }
 
 export function registerGame(game: Game): void {
