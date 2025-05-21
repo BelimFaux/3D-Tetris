@@ -15,9 +15,11 @@ uniform float u_diffuseCoefficient;
 uniform float u_specularCoefficient;
 
 varying vec4 v_vertexColor;
+
 // since we might need interpolated texture coords, calculate final color in vertex shader
 // (lightning calculations are still done in fragment shader)
-varying vec3 v_gouraud;
+varying vec3 v_gouraudColor;
+varying vec3 v_gouraudLight;
 varying vec2 v_texcoord;
 
 const vec3 lightDir = vec3(-1, -1, -1);
@@ -42,13 +44,14 @@ void main() {
     vec3 specularColor = vec3(1.0, 1.0, 1.0) * specularIntensity * u_specularCoefficient;
 
     // combine all components for the final color, that gets interpolated
-    v_gouraud = ambientColor + diffuseColor + specularColor;
+    v_gouraudColor = ambientColor + diffuseColor;
+    v_gouraudLight = specularColor;
     v_vertexColor = vec4(a_color, 1.0);
     v_texcoord = a_texture;
 
     if (a_normal == vec3(0, 0, 0)) {
         v_vertexColor = vec4(a_color, 1.0);
-        v_gouraud = vec3(1.0);
+        v_gouraudColor = vec3(1.0);
     }
 
     gl_Position = u_projection * viewPosition;

@@ -74,7 +74,7 @@ export class Game {
     }
 
     private spawnNewPiece() {
-        const textured = Math.random() <= 1;
+        const textured = Math.random() <= 0.1;
         this.activePiece = new Tetracube(
             [0, DIM.max[1], 0],
             this.nextPiece,
