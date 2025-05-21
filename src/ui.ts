@@ -1,3 +1,4 @@
+import type { Game } from './game.js';
 import { TetracubeType } from './objects/tetracube.js';
 
 /**
@@ -73,4 +74,26 @@ export function setValue(id: string, value: any): void {
     if (pElement !== null) {
         pElement.innerText = value;
     }
+}
+
+function setPopUp(visibility: string): void {
+    const popUp = document.getElementById('popup');
+    if (popUp) {
+        popUp.style.visibility = visibility;
+    }
+}
+
+export function openPopUp(finalScore: number): void {
+    setPopUp('visible');
+    setValue('finalScore', finalScore);
+}
+
+export function registerGame(game: Game): void {
+    const button = document.getElementById('newgame');
+    if (!button) return;
+    button.onclick = () => {
+        game.restartGame();
+        setPopUp('hidden');
+        document.getElementById('canvas')?.focus();
+    };
 }

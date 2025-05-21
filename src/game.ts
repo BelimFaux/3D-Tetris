@@ -31,6 +31,7 @@ function defaultOptions(): GameOptions {
 export class Game {
     gl;
     options;
+    gameOver;
     camera;
 
     shader;
@@ -46,6 +47,7 @@ export class Game {
     constructor(gl: WebGL2RenderingContext) {
         this.gl = gl;
         this.options = defaultOptions();
+        this.gameOver = false;
         this.camera = new Camera();
 
         this.shader = getShader('gouraud');
@@ -71,6 +73,7 @@ export class Game {
 
         new MouseHandler(this.camera);
         new KeyboardHandler(this);
+        ui.registerGame(this);
     }
 
     private spawnNewPiece() {
@@ -144,16 +147,22 @@ export class Game {
         ui.updateScore(this.score);
     }
 
-    gameOver() {
-        this.pieces = [];
+    restartGame() {
+        this.gameOver = false;
         this.spawnNewPiece();
+        this.pieces = [];
         this.score = 0;
         ui.updateScore(this.score);
     }
 
+    isGameOver() {
+        return this.gameOver;
+    }
+
     handleLandedPiece() {
         if (this.activePiece.testCollisions() & CollisionEvent.TOP) {
-            this.gameOver();
+            this.gameOver = true;
+            ui.openPopUp(this.score);
             return;
         }
         this.activePiece.snapToGrid();
@@ -247,6 +256,7 @@ export class Game {
     }
 
     tick(deltaTime: number) {
+        if (this.gameOver) return;
         this.gravity(deltaTime);
         this.testFullCols();
         this.drawObjects();

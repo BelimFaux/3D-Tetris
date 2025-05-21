@@ -2,7 +2,7 @@ html,
 head,
 body {
     margin: 0;
-    background-color: #2a2a2a;
+    background-color: #0e364f;
 }
 
 #canvas {
@@ -50,4 +50,50 @@ body {
 .error-box-title {
     color: #eee;
     border-bottom: 1px solid gray;
+}
+
+.floatingwidget {
+    visibility: hidden;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -70%);
+
+    width: 400px;
+    height: fit-content;
+
+    background-color: #0e364f;
+    border: 1px solid white;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+#score {
+    color: #eee;
+    text-align: center;
+}
+
+#gameover {
+    font-family: 'Inter', sans-serif;
+    color: #eee;
+    text-align: center;
+    font-size: 30px;
+    padding-top: 15px;
+}
+
+#newgame {
+    display: block;
+    color: #eee;
+    background-color: rgba(0.2, 0.2, 0.2, 0.3);
+    border: 1px solid white;
+    border-radius: 10px;
+    width: fit-content;
+    margin: auto;
+    margin-bottom: 15px;
+    padding: 15px 32px;
+    font-size: 16px;
+}
+
+#newgame:hover {
+    background-color: rgba(0.2, 0.2, 0.2, 0.6);
 }

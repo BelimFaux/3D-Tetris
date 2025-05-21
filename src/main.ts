@@ -12,7 +12,6 @@ async function setup(): Promise<WebGL2RenderingContext | null> {
     await loadFile('shaders/phong.vert');
 
     await loadFile('ressources/cube.obj');
-    await loadFile('ressources/cube.obj');
     await loadFile('ressources/cylinder.obj');
     parseObjData();
 
@@ -57,6 +56,7 @@ function main(gl: WebGL2RenderingContext): void {
 
     let lastTime = 0;
     let lastUpdate = 0;
+
     const draw = (time: number): void => {
         const deltaTime = time - lastTime;
         lastTime = time;
@@ -66,11 +66,10 @@ function main(gl: WebGL2RenderingContext): void {
         }
 
         game.tick(deltaTime);
+
         window.requestAnimationFrame(draw);
     };
     window.requestAnimationFrame(draw);
-
-    gl.clear(gl.COLOR_BUFFER_BIT);
 }
 
 // handle all errors that get thrown

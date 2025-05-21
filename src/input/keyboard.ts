@@ -1,7 +1,6 @@
 import * as glm from '../gl-matrix/index.js';
 
 import type { Game } from '../game.js';
-import { TetracubeType } from '../objects/tetracube.js';
 
 export class KeyboardHandler {
     keySet: Set<string>;

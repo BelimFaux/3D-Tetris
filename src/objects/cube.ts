@@ -11,8 +11,6 @@ export function parseObjData() {
     const parser = new ObjParser();
     cubeData = parser.parse(getFile('ressources/cube.obj'));
     cylinderData = parser.parse(getFile('ressources/cylinder.obj'));
-    console.log(cubeData);
-    console.log(cylinderData);
 }
 
 export function getRandomColor(): vec4 {
