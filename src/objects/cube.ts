@@ -9,8 +9,8 @@ let cylinderData: ObjData;
 
 export function parseObjData() {
     const parser = new ObjParser();
-    cubeData = parser.parse(getFile('ressources/cube.obj'));
-    cylinderData = parser.parse(getFile('ressources/cylinder.obj'));
+    cubeData = parser.parse(getFile('ressources/models/cube.obj'));
+    cylinderData = parser.parse(getFile('ressources/models/cylinder.obj'));
 }
 
 export function getRandomColor(): vec4 {
@@ -135,7 +135,7 @@ export class Cube {
             gl.activeTexture(gl.TEXTURE0);
             gl.bindTexture(
                 gl.TEXTURE_2D,
-                getTexture('ressources/cylinderTexture.webp'),
+                getTexture('ressources/textures/barrelTexture.webp'),
             );
             gl.uniform1i(shader.locUTexture, 0);
             gl.uniform1i(shader.locUIsTextured, 1);
@@ -161,7 +161,7 @@ export class Cube {
             gl.activeTexture(gl.TEXTURE1);
             gl.bindTexture(
                 gl.TEXTURE_2D,
-                getTexture('ressources/cubeTexture.webp'),
+                getTexture('ressources/textures/crateTexture.webp'),
             );
             gl.uniform1i(shader.locUTexture, 1);
             gl.uniform1i(shader.locUIsTextured, 1);

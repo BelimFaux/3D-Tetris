@@ -25,12 +25,14 @@ interface Face {
  */
 export class ObjParser {
     vertices: Array<Array<number>> = [];
-    vertexIndices: Array<number> = [];
     normals: Array<Array<number>> = [];
-    normalIndices: Array<number> = [];
     texturecoords: Array<Array<number>> = [];
-    textureIndices: Array<number> = [];
     faces: Array<Face> = [];
+
+    vertexIndices: Array<number> = [];
+    normalIndices: Array<number> = [];
+    textureIndices: Array<number> = [];
+
     currentLine = 0;
 
     constructor() {}
@@ -44,6 +46,7 @@ export class ObjParser {
     parse(file: string): ObjData {
         this.vertices = [];
         this.normals = [];
+        this.texturecoords = [];
         this.vertexIndices = [];
         this.normalIndices = [];
         this.textureIndices = [];

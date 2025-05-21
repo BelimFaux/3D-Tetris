@@ -11,12 +11,12 @@ async function setup(): Promise<WebGL2RenderingContext | null> {
     await loadFile('shaders/phong.frag');
     await loadFile('shaders/phong.vert');
 
-    await loadFile('ressources/cube.obj');
-    await loadFile('ressources/cylinder.obj');
+    await loadFile('ressources/models/cube.obj');
+    await loadFile('ressources/models/cylinder.obj');
     parseObjData();
 
-    addImage('ressources/cubeTexture.webp');
-    addImage('ressources/cylinderTexture.webp');
+    addImage('ressources/textures/crateTexture.webp');
+    addImage('ressources/textures/barrelTexture.webp');
 
     // get the canvas object and handle null
     const canvas = document.getElementById(
