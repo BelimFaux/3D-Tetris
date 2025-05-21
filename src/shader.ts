@@ -22,6 +22,7 @@ export class Shader {
     locUNormal: WebGLUniformLocation = -1;
     locUTexture: WebGLUniformLocation = -1;
     locUIsTextured: WebGLUniformLocation = -1;
+    locUMixWhite: WebGLUniformLocation = -1;
     locUAmbient: WebGLUniformLocation = -1;
     locUDiffuse: WebGLUniformLocation = -1;
     locUSpecular: WebGLUniformLocation = -1;
@@ -102,6 +103,9 @@ export class Shader {
 
         this.locUIsTextured =
             this.gl.getUniformLocation(this.program, 'u_istextured') || -1;
+
+        this.locUMixWhite =
+            this.gl.getUniformLocation(this.program, 'u_mixWhite') || -1;
 
         this.locUAmbient =
             this.gl.getUniformLocation(this.program, 'u_ambientCoefficient') ||

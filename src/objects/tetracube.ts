@@ -236,6 +236,14 @@ export class Tetracube {
         return collisionTest(this, others);
     }
 
+    isAt(yVal: number): boolean {
+        const transform = this.getTransform();
+        return this.cubes.every((cube) => {
+            const cubePos = cube.getCoord(transform);
+            return Math.abs(cubePos[1] - yVal) <= 0.01;
+        });
+    }
+
     removeY(yVal: number) {
         const transform = this.getTransform();
         this.cubes = this.cubes.filter((cube) => {

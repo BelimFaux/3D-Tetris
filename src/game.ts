@@ -9,6 +9,7 @@ import { Tetracube, TetracubeType } from './objects/tetracube.js';
 import { getShader } from './shader.js';
 import { DIM } from './utils/constants.js';
 import { Slider } from './input/slider.js';
+import { BlinkingEffect } from './objects/animation.js';
 
 interface GameOptions {
     gravity: boolean;
@@ -40,8 +41,10 @@ export class Game {
     nextPiece: TetracubeType;
     activePiece: Tetracube;
     pieces: Array<Tetracube> = [];
-    movePiecesBy;
     grid;
+    animation;
+
+    movePiecesBy;
     score;
 
     constructor(gl: WebGL2RenderingContext) {
@@ -66,6 +69,8 @@ export class Game {
         this.activePiece.initVaos(gl, this.shader);
         this.nextPiece = Math.floor(Math.random() * 7);
         ui.updateNextPiece(this.nextPiece);
+
+        this.animation = new BlinkingEffect([], 0);
 
         this.movePiecesBy = 0;
         this.score = 0;
@@ -171,6 +176,7 @@ export class Game {
     }
 
     dropActive() {
+        if (!this.animation.isFinished()) return;
         // just translate down until something is hit
         while (!(this.activePiece.translateY(-0.1) & CollisionEvent.BOTTOM)) {}
         this.handleLandedPiece();
@@ -196,10 +202,11 @@ export class Game {
     }
 
     deleteCol(yVal: number) {
-        this.pieces.forEach((piece) => {
-            piece.removeY(yVal);
-        });
-        this.pieces = this.pieces.filter((piece) => !piece.isEmpty());
+        const cubesToDelete = this.pieces.filter((piece) => piece.isAt(yVal));
+        this.pieces = this.pieces.filter((piece) => !piece.isAt(yVal));
+        if (this.animation.isFinished())
+            this.animation = new BlinkingEffect(cubesToDelete);
+        else this.animation.addPieces(cubesToDelete);
     }
 
     testFullCols() {
@@ -236,6 +243,15 @@ export class Game {
 
         this.shader.initCoefficients(this.sliders);
 
+        if (!this.animation.isFinished()) {
+            this.animation.draw(
+                this.gl,
+                this.shader,
+                viewMatrix,
+                this.options.cylinders,
+            );
+        }
+
         if (this.options.cylinders) {
             this.activePiece.drawCylinders(this.gl, this.shader, viewMatrix);
             this.pieces.forEach((piece) => {
@@ -257,8 +273,12 @@ export class Game {
 
     tick(deltaTime: number) {
         if (this.gameOver) return;
-        this.gravity(deltaTime);
-        this.testFullCols();
+        if (this.animation.isFinished()) {
+            this.gravity(deltaTime);
+            this.testFullCols();
+        } else {
+            this.animation.tick(deltaTime);
+        }
         this.drawObjects();
     }
 }
