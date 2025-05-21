@@ -15,6 +15,7 @@ export enum TetracubeType {
     TOWER_RIGHT,
     TOWER_LEFT,
     TRIPOD,
+    EMPTY,
 }
 
 function buildIPiece(): Array<Cube> {
@@ -115,8 +116,8 @@ function buildCubeList(type: TetracubeType): Array<Cube> {
             return buildTowerLeft();
         case TetracubeType.TRIPOD:
             return buildTripod();
+        case TetracubeType.EMPTY:
         default:
-            // unreachable
             return [];
     }
 }
@@ -239,7 +240,7 @@ export class Tetracube {
         const transform = this.getTransform();
         this.cubes = this.cubes.filter((cube) => {
             const cubePos = cube.getCoord(transform);
-            return Math.abs(cubePos[1] - yVal) >= 0.001;
+            return Math.abs(cubePos[1] - yVal) >= 0.01;
         });
     }
 
@@ -255,6 +256,24 @@ export class Tetracube {
 
     isEmpty(): boolean {
         return this.cubes.length == 0;
+    }
+
+    splitIntoSingles(): Array<Tetracube> {
+        const ret = this.cubes.map((cube) => {
+            const pos = cube.getCoord(this.getTransform());
+            const tcube = new Tetracube(
+                pos,
+                TetracubeType.EMPTY,
+                this.game,
+                false,
+            );
+            cube.displace = [0, 0, 0];
+            tcube.cubes.push(cube);
+            tcube.rotation = this.rotation;
+            return tcube;
+        });
+        this.cubes = [];
+        return ret;
     }
 
     snapToGrid() {

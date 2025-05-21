@@ -86,6 +86,11 @@ export class Game {
         ui.updateNextPiece(this.nextPiece);
     }
 
+    cheatCode() {
+        this.nextPiece = TetracubeType.IPIECE;
+        this.spawnNewPiece();
+    }
+
     getActive(): Tetracube {
         return this.activePiece;
     }
@@ -152,11 +157,12 @@ export class Game {
             return;
         }
         this.activePiece.snapToGrid();
-        this.pieces.push(this.activePiece);
+        this.pieces.push(...this.activePiece.splitIntoSingles()); // once a piece lands, all of it's cubes are on their own...
         this.spawnNewPiece();
     }
 
     dropActive() {
+        // just translate down until something is hit
         while (!(this.activePiece.translateY(-0.1) & CollisionEvent.BOTTOM)) {}
         this.handleLandedPiece();
     }
@@ -167,12 +173,13 @@ export class Game {
         if (this.options.gravity)
             collision = this.activePiece.translateY(amount);
 
+        // move landed pieces down if lines have been killed
         if (this.movePiecesBy > 0) {
             this.pieces.forEach((piece) => {
-                if (piece.translateY(amount) & CollisionEvent.BOTTOM)
+                if (piece.translateY(amount * 2) & CollisionEvent.BOTTOM)
                     piece.snapToGrid();
             });
-            this.movePiecesBy += amount;
+            this.movePiecesBy += amount * 2;
         } else this.movePiecesBy = 0;
 
         if (!(collision & CollisionEvent.BOTTOM)) return;
@@ -184,7 +191,6 @@ export class Game {
             piece.removeY(yVal);
         });
         this.pieces = this.pieces.filter((piece) => !piece.isEmpty());
-        console.log(`Deleted ${yVal}y xz-plane`);
     }
 
     testFullCols() {
@@ -206,6 +212,7 @@ export class Game {
                 this.deleteCol(yVal);
             }
         });
+        // tell gravity how many lines landed pieces can move down by
         this.movePiecesBy += killed;
         this.adjustScore(killed);
     }
