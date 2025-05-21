@@ -6,6 +6,8 @@ import { AXIS, DIM } from '../utils/constants.js';
 import { CollisionEvent, collisionTest } from './collision.js';
 import { Cube, getRandomColor } from './cube.js';
 
+const TEXTURED_PROBABILITY = 0.1;
+
 export enum TetracubeType {
     IPIECE,
     OPIECE,
@@ -133,7 +135,7 @@ export class Tetracube {
         initialPos: vec3,
         type: TetracubeType,
         game: Game,
-        textured: boolean,
+        textured: boolean = Math.random() <= TEXTURED_PROBABILITY,
     ) {
         this.cubes = buildCubeList(type);
         this.cubes.forEach((cube) => (cube.textured = textured));
@@ -267,6 +269,8 @@ export class Tetracube {
     }
 
     splitIntoSingles(): Array<Tetracube> {
+        const color = getRandomColor();
+        const textured = Math.random() <= TEXTURED_PROBABILITY;
         const ret = this.cubes.map((cube) => {
             const pos = cube.getCoord(this.getTransform());
             const tcube = new Tetracube(
@@ -275,8 +279,8 @@ export class Tetracube {
                 this.game,
                 false,
             );
-            cube.displace = [0, 0, 0];
-            tcube.cubes.push(cube);
+            tcube.cubes.push(new Cube([0, 0, 0], color));
+            (tcube.cubes[0] as Cube).textured = textured;
             tcube.rotation = this.rotation;
             return tcube;
         });

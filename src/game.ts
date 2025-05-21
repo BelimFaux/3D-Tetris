@@ -82,12 +82,10 @@ export class Game {
     }
 
     private spawnNewPiece() {
-        const textured = Math.random() <= 0.1;
         this.activePiece = new Tetracube(
             [0, DIM.max[1], 0],
             this.nextPiece,
             this,
-            textured,
         );
         this.activePiece.initVaos(this.gl, this.shader);
         this.nextPiece = Math.floor(Math.random() * 7);
@@ -171,7 +169,9 @@ export class Game {
             return;
         }
         this.activePiece.snapToGrid();
-        this.pieces.push(...this.activePiece.splitIntoSingles()); // once a piece lands, all of it's cubes are on their own...
+        const newPieces = this.activePiece.splitIntoSingles();
+        newPieces.forEach((piece) => piece.initVaos(this.gl, this.shader));
+        this.pieces.push(...newPieces); // once a piece lands, all of it's cubes are on their own...
         this.spawnNewPiece();
     }
 
