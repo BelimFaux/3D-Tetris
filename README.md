@@ -2,11 +2,11 @@
 
 ## Claim
 
-All main tasks, that is:
+I've implemented all main tasks, that is:
 
 - T1, T2, T3, T4, T5, T6, T7, T8
 
-From the extra credit:
+And some from the extra credit:
 
 - B1, 2x B3
 
@@ -36,8 +36,8 @@ live-server
 
 ## Additional and general remarks
 
-- I added some extra things, that seemed helpful for me:
-    - An axis overlay (like in lab1a) that shows the axis of the grid (it does _not_ rotate with the block) and can be used for better orientation, when the grid is rotated in some weird way. The overlay can be toggled with the '#' key.
+- I added some extra things, that seemed helpful/fun for me:
+    - An axis overlay (like in lab1a) that shows the axis of the grid and lies at the current blocks center of rotation (it does _not_ rotate with the block). This can be used for better orientation, when the grid is rotated in some weird way. The overlay can be toggled with the '#' key.
     - A 'cheat code' that instantly spawns an I-Piece, which can be helpful for testing some things. Can be activated by pressing both ',' and '.' at the same time.
     - Music that plays in the background (paused by default) which can be toggled by pressing 'm'
 - Credits
