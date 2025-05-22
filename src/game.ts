@@ -19,6 +19,7 @@ interface GameOptions {
     gouraud: boolean;
     cylinders: boolean;
     axisOverlay: boolean;
+    musicPlaying: boolean;
 }
 
 function defaultOptions(): GameOptions {
@@ -29,6 +30,7 @@ function defaultOptions(): GameOptions {
         gouraud: false,
         cylinders: false,
         axisOverlay: false,
+        musicPlaying: false,
     };
 }
 
@@ -37,6 +39,7 @@ export class Game {
     options;
     gameOver;
     camera;
+    music;
 
     shader;
     sliders;
@@ -56,6 +59,9 @@ export class Game {
         this.options = defaultOptions();
         this.gameOver = false;
         this.camera = new Camera();
+        this.music = new Audio('ressources/sounds/TetriX.wav');
+        this.music.loop = true;
+        if (this.options.musicPlaying) this.music.play();
 
         this.shader = getShader('gouraud');
         ui.updateShader('gouraud');
@@ -124,6 +130,12 @@ export class Game {
         this.options.axisOverlay = !this.options.axisOverlay;
     }
 
+    toggleMusic() {
+        if (this.options.musicPlaying) this.music.pause();
+        else this.music.play();
+        this.options.musicPlaying = !this.options.musicPlaying;
+    }
+
     togglePerspective() {
         const persp = (this.options.perspective = !this.options.perspective);
         if (persp) this.camera.initPerspective();
@@ -167,16 +179,17 @@ export class Game {
         this.spawnNewPiece();
         this.pieces = [];
         this.score = 0;
+        if (this.options.musicPlaying) {
+            this.music.currentTime = 0;
+            this.music.play();
+        }
         ui.updateScore(this.score);
-    }
-
-    isGameOver() {
-        return this.gameOver;
     }
 
     handleLandedPiece() {
         if (this.activePiece.testCollisions() & CollisionEvent.TOP) {
             this.gameOver = true;
+            this.music.pause();
             ui.openPopUp(this.score);
             return;
         }

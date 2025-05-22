@@ -52,6 +52,8 @@ export class KeyboardHandler {
 
         if (this.keySet.has('#')) this.game.toggleAxis();
 
+        if (this.keySet.has('m')) this.game.toggleMusic();
+
         if (this.keySet.has('.') && this.keySet.has(',')) this.game.cheatCode();
     }
 
