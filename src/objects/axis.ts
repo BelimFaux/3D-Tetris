@@ -1,9 +1,7 @@
-import type { Game } from '../game.js';
 import * as glm from '../gl-matrix/index.js';
-import { multiply } from '../gl-matrix/mat2.js';
 
+import type { Game } from '../game.js';
 import type { Shader } from '../shader.js';
-import type { Tetracube } from './tetracube.js';
 
 const vertices = new Float32Array(
     [
@@ -96,7 +94,7 @@ export class AxisOverlay {
         scaleFactor: number = 1.5,
     ): void {
         // the axis 'steals' the model matrix of the active so it appears at the same position/rotation/scale
-        const modelMatrix = this.game.activePiece.getTransform();
+        const modelMatrix = glm.mat4.clone(this.game.activePiece.translation);
         glm.mat4.scale(modelMatrix, modelMatrix, [
             scaleFactor,
             scaleFactor,

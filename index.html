@@ -11,6 +11,7 @@
             If you can read this, HTML5 might not be supported on this
             browser...
         </canvas>
+
         <div id="left">
             <div class="widget" id="info">
                 <p id="deltaTime"></p>
@@ -53,6 +54,12 @@
             </p>
         </div>
 
+        <div id="right">
+            <div class="widget" id="error-box">
+                <span class="error-box-title">Box for Errors:</span>
+            </div>
+        </div>
+
         <div class="floatingwidget" id="popup">
             <h1 id="gameover">Game Over</h1>
             <p id="finalscore">
@@ -63,9 +70,6 @@
             </button>
         </div>
 
-        <div class="widget" id="error-box">
-            <span class="error-box-title">Box for Errors:</span>
-        </div>
         <script type="module" src="js/main.js"></script>
     </body>
 </html>
