@@ -12,7 +12,7 @@ export class Camera {
     constructor() {
         this.projectionMatrix = glm.mat4.create();
         this.viewMatrix = glm.mat4.create();
-        this.eye = glm.vec3.fromValues(7.0, 5.0, 7.0);
+        this.eye = glm.vec3.fromValues(0.0, 12.0, 0.0);
         this.viewTransforms = glm.mat4.create();
 
         this.halfWorldWidth = 15.0;
@@ -25,7 +25,7 @@ export class Camera {
         const target = glm.vec3.fromValues(0.0, 0.0, 0.0);
         let up = AXIS.Y;
         if (this.eye[0] === target[0] && this.eye[2] === target[2]) {
-            up = AXIS.Z; // Use Z-axis as up when looking straight down
+            glm.vec3.negate(up, AXIS.Z); // Use negative Z-axis as up when looking straight down
         }
         glm.mat4.lookAt(this.viewMatrix, this.eye, target, up);
     }
