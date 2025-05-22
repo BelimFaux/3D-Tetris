@@ -40,7 +40,7 @@ void main() {
     vec3 finalColor = ambientColor + diffuseColor + specularColor;
     finalColor = mix(finalColor, vec3(1.0, 1.0, 1.0), u_mixWhite);
 
-    if (v_normal == vec3(0.0)) finalColor = vec3(1.0);
+    if (v_normal == vec3(0.0)) finalColor = v_vertexColor.rgb;
 
     gl_FragColor = vec4(finalColor, 1.0);
 }

@@ -10,6 +10,7 @@ import { getShader } from './shader.js';
 import { DIM } from './utils/constants.js';
 import { Slider } from './input/slider.js';
 import { BlinkingEffect } from './objects/animation.js';
+import { AxisOverlay } from './objects/axis.js';
 
 interface GameOptions {
     gravity: boolean;
@@ -17,6 +18,7 @@ interface GameOptions {
     perspective: boolean;
     gouraud: boolean;
     cylinders: boolean;
+    axisOverlay: boolean;
 }
 
 function defaultOptions(): GameOptions {
@@ -26,6 +28,7 @@ function defaultOptions(): GameOptions {
         perspective: false,
         gouraud: false,
         cylinders: false,
+        axisOverlay: false,
     };
 }
 
@@ -42,6 +45,7 @@ export class Game {
     activePiece: Tetracube;
     pieces: Array<Tetracube> = [];
     grid;
+    axis;
     animation;
 
     movePiecesBy;
@@ -59,6 +63,9 @@ export class Game {
 
         this.grid = new Grid();
         this.grid.initVao(gl, this.shader);
+        this.axis = new AxisOverlay(this);
+        this.axis.initVAO(gl, this.shader);
+
         this.nextPiece = Math.floor(Math.random() * 7);
         this.activePiece = new Tetracube(
             [0, DIM.max[1], 0],
@@ -113,6 +120,10 @@ export class Game {
         this.options.cylinders = !this.options.cylinders;
     }
 
+    toggleAxis() {
+        this.options.axisOverlay = !this.options.axisOverlay;
+    }
+
     togglePerspective() {
         const persp = (this.options.perspective = !this.options.perspective);
         if (persp) this.camera.initPerspective();
@@ -127,6 +138,7 @@ export class Game {
 
         this.activePiece.initVaos(this.gl, this.shader);
         this.grid.initVao(this.gl, this.shader);
+        this.axis.initVAO(this.gl, this.shader);
         this.pieces.forEach((piece) => piece.initVaos(this.gl, this.shader));
     }
 
@@ -269,6 +281,9 @@ export class Game {
         } else {
             this.grid.maybeDraw(this.gl, this.shader, this.camera);
         }
+
+        if (this.options.axisOverlay)
+            this.axis.draw(this.gl, this.shader, viewMatrix);
     }
 
     tick(deltaTime: number) {
