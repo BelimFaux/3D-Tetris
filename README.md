@@ -36,12 +36,11 @@ live-server
 
 ## Additional and general remarks
 
+- I decided to always keep the axis of the controlled cube constant, meaning after rotating the XYZ-directions stay the same, as do the axis around which the cube rotates. This makes it easier to control the cube predictably.
 - I added some extra things, that seemed helpful/fun for me:
-    - An axis overlay (like in lab1a) that shows the axis of the grid and lies at the current blocks center of rotation (it does _not_ rotate with the block). This can be used for better orientation, when the grid is rotated in some weird way. The overlay can be toggled with the '#' key.
+    - An axis overlay (like in lab1a) that shows the axis of the grid and lies at the current blocks center of rotation. This can be used for better orientation, when the grid is rotated in some weird way (The movement controls always go in the direction, that the axis shows, and the rotations always rotate around these axes aswell). The overlay can be toggled with the '#' key.
     - A 'cheat code' that instantly spawns an I-Piece, which can be helpful for testing some things. Can be activated by pressing both ',' and '.' at the same time.
     - Music that plays in the background (paused by default) which can be toggled by pressing 'm'
-- Credits
-    - I used the following ressources for the textures with just minimal alignment changes:
-        - [https://stock.adobe.com/at/images/wooden-crate-front-view-cargo-box-texture-3d-rendering/199149984](https://stock.adobe.com/at/images/wooden-crate-front-view-cargo-box-texture-3d-rendering/199149984)
-        - [https://www.pinterest.com/pin/89157267620469807/](https://www.pinterest.com/pin/89157267620469807/)
-    - The music is not made by me, but by a friend of mine that gave me explicit permission to use it here.
+- I used the following ressources for the textures with just minimal alignment changes:
+    - [https://stock.adobe.com/at/images/wooden-crate-front-view-cargo-box-texture-3d-rendering/199149984](https://stock.adobe.com/at/images/wooden-crate-front-view-cargo-box-texture-3d-rendering/199149984)
+    - [https://www.pinterest.com/pin/89157267620469807/](https://www.pinterest.com/pin/89157267620469807/)

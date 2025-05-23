@@ -193,6 +193,13 @@ export class Tetracube {
     }
 
     private rawRotate(rad: number, axis: vec3) {
+        const inv = glm.mat4.create();
+        const old = glm.mat4.clone(this.rotation);
+        glm.mat4.transpose(inv, this.rotation); // rot matrix is orthogonal so transpose is inverse
+
+        // undo previous rotation so the axes stay the same
+        glm.mat4.multiply(this.rotation, this.rotation, inv);
+
         switch (axis) {
             case AXIS.X:
                 glm.mat4.rotateX(this.rotation, this.rotation, rad);
@@ -206,6 +213,8 @@ export class Tetracube {
             default:
                 glm.mat4.rotate(this.rotation, this.rotation, rad, axis);
         }
+
+        glm.mat4.multiply(this.rotation, this.rotation, old);
     }
 
     private rotate(deg: number, axis: vec3): CollisionEvent {
