@@ -278,8 +278,6 @@ export class Tetracube {
     }
 
     splitIntoSingles(): Array<Tetracube> {
-        const color = getRandomColor();
-        const textured = Math.random() <= TEXTURED_PROBABILITY;
         const ret = this.cubes.map((cube) => {
             const pos = cube.getCoord(this.getTransform());
             const tcube = new Tetracube(
@@ -288,8 +286,8 @@ export class Tetracube {
                 this.game,
                 false,
             );
-            tcube.cubes.push(new Cube([0, 0, 0], color));
-            (tcube.cubes[0] as Cube).textured = textured;
+            tcube.cubes.push(new Cube([0, 0, 0], cube.color));
+            (tcube.cubes[0] as Cube).textured = cube.textured;
             tcube.rotation = this.rotation;
             return tcube;
         });
