@@ -152,40 +152,41 @@
         <div class="floatingwidget" id="startPopup">
             <h1 class="popupTitle">3D Tetris</h1>
 
-            <div class="optionToggles">
+            <form class="optionToggles">
                 <u>Options:</u>
+
                 <div class="option">
                     <label>
-                        Music
                         <input type="checkbox" id="playMusic" />
+                        Music
                     </label>
                 </div>
 
                 <div class="option">
                     <label>
-                        Cylinders
                         <input type="checkbox" id="enableCylinders" />
+                        Cylinders
                     </label>
                 </div>
 
                 <div class="option">
                     <label>
-                        Axis
                         <input type="checkbox" id="enableAxis" />
+                        Axis
                     </label>
                 </div>
 
                 <div class="option">
                     <label>
-                        Size
                         <select id="fieldSize">
                             <option value="4x4" selected="selected">4x4</option>
                             <option value="5x5">5x5</option>
                             <option value="6x6">6x6</option>
                         </select>
+                        Size
                     </label>
                 </div>
-            </div>
+            </form>
 
             <button id="startgame" class="popupButton" type="button">
                 Start a new Game
@@ -195,7 +196,7 @@
         <div class="floatingwidget" id="gameoverPopup">
             <h1 class="popupTitle">Game Over</h1>
             <p id="finalscore">
-                Final score <output id="finalScoreVal">0</output>
+                Final score: <output id="finalScoreVal">0</output>
             </p>
             <button id="newgame" class="popupButton" type="button">
                 Start a new Game

@@ -110,6 +110,7 @@ details ul {
 
     width: 400px;
     height: fit-content;
+    text-align: center;
 
     background-color: var(--bg-color);
     border: 1px solid var(--widget-border);
@@ -126,15 +127,21 @@ details ul {
 }
 
 .optionToggles {
-    text-align: center;
+    text-align: left;
+    width: fit-content;
     padding: 5px;
-    margin-bottom: 20px;
+    display: inline-block;
+
+    input {
+        margin-bottom: 10px;
+    }
 
     select {
         background-color: var(--widget-bg);
         color: var(--text-color);
         border: 1px solid var(--widget-border);
         border-radius: 5px;
+        margin-bottom: 10px;
     }
 }
 
