@@ -153,6 +153,6 @@ details ul {
     font-size: 16px;
 }
 
-#newgame:hover {
+.popupButton:hover {
     background-color: var(--widget-hover);
 }
