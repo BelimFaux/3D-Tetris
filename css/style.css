@@ -5,6 +5,7 @@
     --widget-bg: #3132445c;
     --widget-border: #45475a;
     --widget-hover: #313244b6;
+    --popup-active: #89dceb;
 
     --red: #f38ba8;
     --blue: #89b4fa;
@@ -116,12 +117,17 @@ details ul {
     padding: 10px;
 }
 
+.floatingwidget:hover {
+    border: 1px solid var(--popup-active);
+}
+
 #finalscore {
     text-align: center;
 }
 
 .optionToggles {
     text-align: center;
+    padding: 5px;
     margin-bottom: 20px;
 
     select {
