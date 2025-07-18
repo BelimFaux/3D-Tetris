@@ -1,6 +1,9 @@
 import * as glm from './gl-matrix/index.js';
-import { AXIS } from './utils/constants.js';
+import { AXIS } from './utils/globals.js';
 
+/**
+ * Class to represent a Camera and handle view-related tasks
+ */
 export class Camera {
     projectionMatrix;
     viewMatrix;
@@ -9,6 +12,10 @@ export class Camera {
     halfWorldWidth;
     eye;
 
+    /**
+     * Construct a new camera
+     * The eye will be on [7,5,7] by default and the view will be orthogonal
+     */
     constructor() {
         this.projectionMatrix = glm.mat4.create();
         this.viewMatrix = glm.mat4.create();
@@ -21,7 +28,11 @@ export class Camera {
         this.initView();
     }
 
-    private initView() {
+    /**
+     * initialize the view matrix by looking at [0,0,0] from the eye
+     * The Up vector will be the Y-Axis, or the negative Z-Axis if the view direction is exactly along the Y axis
+     */
+    private initView(): void {
         const target = glm.vec3.fromValues(0.0, 0.0, 0.0);
         let up = AXIS.Y;
         if (this.eye[0] === target[0] && this.eye[2] === target[2]) {
@@ -30,22 +41,36 @@ export class Camera {
         glm.mat4.lookAt(this.viewMatrix, this.eye, target, up);
     }
 
-    private zoom(factor: number) {
+    /**
+     * Helper to zoom in by a given omount
+     *
+     * @param factor {number} the amount to zoom by
+     */
+    private zoom(factor: number): void {
         glm.vec3.scale(this.eye, this.eye, factor);
         this.halfWorldWidth *= factor;
         this.initView();
         if (!this.perspective) this.initOrthogonal();
     }
 
-    zoomOut() {
+    /**
+     * Zoom out by 10%
+     */
+    zoomOut(): void {
         this.zoom(1.1);
     }
 
-    zoomIn() {
+    /**
+     * Zoom in by 10%
+     */
+    zoomIn(): void {
         this.zoom(0.9);
     }
 
-    initOrthogonal() {
+    /**
+     * Initialize the view matrix as orthogonal
+     */
+    initOrthogonal(): void {
         this.perspective = false;
         const { width, height } = (
             document.getElementById('canvas') as HTMLElement
@@ -62,7 +87,10 @@ export class Camera {
         );
     }
 
-    initPerspective() {
+    /**
+     * Initialize the view matrix as perspective
+     */
+    initPerspective(): void {
         this.perspective = true;
         const { width, height } = (
             document.getElementById('canvas') as HTMLElement
@@ -76,10 +104,16 @@ export class Camera {
         );
     }
 
+    /**
+     * Return the current eye point
+     */
     getEye(): vec3 {
         return this.eye;
     }
 
+    /**
+     * Return the current view matrix
+     */
     getView(): mat4 {
         const updatedViewMatrix = glm.mat4.create();
         glm.mat4.multiply(
@@ -90,10 +124,16 @@ export class Camera {
         return updatedViewMatrix;
     }
 
+    /**
+     * Return the current projection matrix
+     */
     getProjection(): mat4 {
         return this.projectionMatrix;
     }
 
+    /**
+     * Return the current view transformation matrix
+     */
     getTransform(): mat4 {
         return this.viewTransforms;
     }

@@ -8,12 +8,18 @@ export interface ObjData {
     indices: Uint16Array;
 }
 
+/**
+ * A vertex as specified in the obj file
+ */
 interface Vertex {
     v: number;
     vt: number;
     vn: number;
 }
 
+/**
+ * A Face as specified in the obj file
+ */
 interface Face {
     v1: Vertex;
     v2: Vertex;
@@ -35,6 +41,9 @@ export class ObjParser {
 
     currentLine = 0;
 
+    /**
+     * construct a new parser
+     */
     constructor() {}
 
     /**
@@ -42,6 +51,7 @@ export class ObjParser {
      *
      * @param file {string} - the contents of the file
      * @returns {ObjData} the resulting ObjData
+     * @throws an error message if the file could not be parsed for some reason
      */
     parse(file: string): ObjData {
         this.vertices = [];
@@ -91,6 +101,7 @@ export class ObjParser {
      * Throw an error with the corresponding line number
      *
      * @param msg {string} - the error message
+     * @throws the error message with line number
      */
     private error(msg: string): void {
         throw `Error on line ${this.currentLine}: ${msg}`;

@@ -1,22 +1,34 @@
 import * as glm from '../gl-matrix/index.js';
 import type { Shader } from '../shader.js';
-import { DIM } from '../utils/constants.js';
+import { DIM } from '../utils/globals.js';
 import { getFile, getTexture } from '../utils/files.js';
 import { ObjParser, type ObjData } from './objparser.js';
 
 let cubeData: ObjData;
 let cylinderData: ObjData;
 
-export function parseObjData() {
+/**
+ * parse data for primitives (cube and cylinder)
+ * will fail if the files have not been loaded before
+ */
+export function parseObjData(): void {
     const parser = new ObjParser();
     cubeData = parser.parse(getFile('ressources/models/cube.obj'));
     cylinderData = parser.parse(getFile('ressources/models/cylinder.obj'));
 }
 
+/**
+ * get a random color
+ *
+ * @returns {vec4} the random color
+ */
 export function getRandomColor(): vec4 {
     return [Math.random(), Math.random(), Math.random(), 1];
 }
 
+/**
+ * Class to represent a cube
+ */
 export class Cube {
     cubeData;
     cylinderData;
@@ -26,6 +38,12 @@ export class Cube {
     cubeVaoIndex: WebGLVertexArrayObject = -1;
     cylinderVaoIndex: WebGLVertexArrayObject = -1;
 
+    /**
+     * construct a new cube
+     *
+     * @param displace {vec3} the displacement of the cube
+     * @param [color=getRandomColor()] {vec4} the color of the cube
+     */
     constructor(displace: vec3, color: vec4 = getRandomColor()) {
         this.cubeData = cubeData;
         this.cylinderData = cylinderData;
@@ -33,7 +51,15 @@ export class Cube {
         this.displace = displace;
     }
 
-    initVaoFrom(
+    /**
+     * init vao for an obj data object
+     *
+     * @param gl {WebGL2RenderingContext} the webgl context
+     * @param shader {Shader} the shader
+     * @param data {ObjData} the data for the object
+     * @returns {WebGLVertexArrayObject} the vao for the data
+     */
+    private initVaoFrom(
         gl: WebGL2RenderingContext,
         shader: Shader,
         data: ObjData,
@@ -86,11 +112,23 @@ export class Cube {
         return vaoIndex;
     }
 
-    initVao(gl: WebGL2RenderingContext, shader: Shader) {
+    /**
+     * initialize vaos for the cube
+     *
+     * @param gl {WebGLRenderingContext} the webgl context
+     * @param shader {Shader} the shader
+     */
+    initVao(gl: WebGL2RenderingContext, shader: Shader): void {
         this.cubeVaoIndex = this.initVaoFrom(gl, shader, this.cubeData);
         this.cylinderVaoIndex = this.initVaoFrom(gl, shader, this.cylinderData);
     }
 
+    /**
+     * return the coordinate that the cube occupies
+     *
+     * @param transform {mat4} a transformation matrix that should be applied before
+     * @returns {vec3} the coordinate
+     */
     getCoord(transform: mat4): vec3 {
         const center = glm.vec3.clone(this.displace);
         glm.vec3.transformMat4(center, center, transform);
@@ -103,12 +141,20 @@ export class Cube {
         return center;
     }
 
-    update(
+    /**
+     * calculate the final positions using the transform and view matrices and bind to the shader
+     *
+     * @param gl {WebGLRenderingContext} the webgl context
+     * @param shader {Shader} the shader
+     * @param viewMatrix {mat4} the view matrix
+     * @param parentTransform {mat4} the transformation matrix
+     */
+    private update(
         gl: WebGL2RenderingContext,
         shader: Shader,
         viewMatrix: mat4,
         parentTransform: mat4,
-    ) {
+    ): void {
         const modelViewMatrix = glm.mat4.create();
 
         glm.mat4.multiply(modelViewMatrix, modelViewMatrix, viewMatrix);
@@ -124,12 +170,20 @@ export class Cube {
         }
     }
 
+    /**
+     * draw the cube as a cylinder
+     *
+     * @param gl {WebGLRenderingContext} the webgl context
+     * @param shader {Shader} the shader
+     * @param viewMatrix {mat4} the view matrix
+     * @param parentTransform {mat4} the transformation matrix
+     */
     drawCylinder(
         gl: WebGL2RenderingContext,
         shader: Shader,
         viewMatrix: mat4,
         parentTransform: mat4,
-    ) {
+    ): void {
         this.update(gl, shader, viewMatrix, parentTransform);
         if (this.textured) {
             gl.activeTexture(gl.TEXTURE0);
@@ -150,6 +204,14 @@ export class Cube {
         gl.uniform1i(shader.locUIsTextured, 0);
     }
 
+    /**
+     * draw the cube as a cube
+     *
+     * @param gl {WebGLRenderingContext} the webgl context
+     * @param shader {Shader} the shader
+     * @param viewMatrix {mat4} the view matrix
+     * @param parentTransform {mat4} the transformation matrix
+     */
     drawCube(
         gl: WebGL2RenderingContext,
         shader: Shader,

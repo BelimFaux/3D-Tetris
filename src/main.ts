@@ -5,6 +5,11 @@ import { Game } from './game.js';
 import { loadShaders } from './shader.js';
 import { parseObjData } from './objects/cube.js';
 
+/**
+ * Preloads all assets and initializes the rendering context
+ *
+ * @returns {Promise<WebGL2RenderingContext | null>} the rendering context or null if any error occured (no canvas or webgl not supported)
+ */
 async function setup(): Promise<WebGL2RenderingContext | null> {
     await loadFile('shaders/gouraud.frag');
     await loadFile('shaders/gouraud.vert');
@@ -51,6 +56,11 @@ async function setup(): Promise<WebGL2RenderingContext | null> {
     return gl;
 }
 
+/**
+ * Creates a new game and starts the game loop
+ *
+ * @param gl {WebGL2RenderingContext} - the webgl context
+ */
 function main(gl: WebGL2RenderingContext): void {
     ui.openStartPopUp();
 

@@ -2,12 +2,16 @@ import type { Game } from '../game.js';
 import * as glm from '../gl-matrix/index.js';
 
 import type { Shader } from '../shader';
-import { AXIS, DIM } from '../utils/constants.js';
+import { AXIS, DIM } from '../utils/globals.js';
 import { CollisionEvent, collisionTest } from './collision.js';
 import { Cube, getRandomColor } from './cube.js';
 
+// probability for a textured tetracube
 const TEXTURED_PROBABILITY = 0.1;
 
+/**
+ * All possible types of tetracubes
+ */
 export enum TetracubeType {
     IPIECE,
     OPIECE,
@@ -20,6 +24,9 @@ export enum TetracubeType {
     EMPTY,
 }
 
+/**
+ * Helper to get all cubes for an I-Piece
+ */
 function buildIPiece(): Array<Cube> {
     const colors = getRandomColor();
     return [
@@ -30,6 +37,9 @@ function buildIPiece(): Array<Cube> {
     ];
 }
 
+/**
+ * Helper to get all cubes for an I-Piece
+ */
 function buildOPiece(): Array<Cube> {
     const colors = getRandomColor();
     return [
@@ -40,6 +50,9 @@ function buildOPiece(): Array<Cube> {
     ];
 }
 
+/**
+ * Helper to get all cubes for an O-Piece
+ */
 function buildLPiece(): Array<Cube> {
     const colors = getRandomColor();
     return [
@@ -50,6 +63,9 @@ function buildLPiece(): Array<Cube> {
     ];
 }
 
+/**
+ * Helper to get all cubes for an T-Piece
+ */
 function buildTPiece(): Array<Cube> {
     const colors = getRandomColor();
     return [
@@ -60,6 +76,9 @@ function buildTPiece(): Array<Cube> {
     ];
 }
 
+/**
+ * Helper to get all cubes for an N-Piece
+ */
 function buildNPiece(): Array<Cube> {
     const colors = getRandomColor();
     return [
@@ -70,6 +89,9 @@ function buildNPiece(): Array<Cube> {
     ];
 }
 
+/**
+ * Helper to get all cubes for a Tower-Right Piece
+ */
 function buildTowerRight(): Array<Cube> {
     const colors = getRandomColor();
     return [
@@ -80,6 +102,9 @@ function buildTowerRight(): Array<Cube> {
     ];
 }
 
+/**
+ * Helper to get all cubes for an Tower-Left Piece
+ */
 function buildTowerLeft(): Array<Cube> {
     const colors = getRandomColor();
     return [
@@ -90,6 +115,9 @@ function buildTowerLeft(): Array<Cube> {
     ];
 }
 
+/**
+ * Helper to get all cubes for a Tripod Piece
+ */
 function buildTripod(): Array<Cube> {
     const colors = getRandomColor();
     return [
@@ -100,6 +128,9 @@ function buildTripod(): Array<Cube> {
     ];
 }
 
+/**
+ * Helper to get all cubes for a given tetracube type
+ */
 function buildCubeList(type: TetracubeType): Array<Cube> {
     switch (type) {
         case TetracubeType.IPIECE:
@@ -124,6 +155,9 @@ function buildCubeList(type: TetracubeType): Array<Cube> {
     }
 }
 
+/**
+ * Class to represent a Tetracube
+ */
 export class Tetracube {
     cubes;
     position;
@@ -131,6 +165,14 @@ export class Tetracube {
     rotation;
     game;
 
+    /**
+     * Construct a new tetracube
+     *
+     * @param initialPos {vec3} the initial position
+     * @param type {TetracubeType} the type of the tetracube
+     * @param game {Game} the game that the tetracube belongs to
+     * @param [textured=Math.random() <= TEXTURED_PROBABILITY] {boolean} if the cube is textured or not
+     */
     constructor(
         initialPos: vec3,
         type: TetracubeType,
@@ -153,17 +195,35 @@ export class Tetracube {
         glm.mat4.translate(this.translation, this.translation, this.position);
     }
 
-    initVaos(gl: WebGL2RenderingContext, shader: Shader) {
+    /**
+     * Initialize the vaos of the tetracube for the shader and context
+     *
+     * @param gl {WebGL2RenderingContext} the webgl context
+     * @param shader {Shader} the shader initialize for
+     */
+    initVaos(gl: WebGL2RenderingContext, shader: Shader): void {
         this.cubes.forEach((cube) => {
             cube.initVao(gl, shader);
         });
     }
 
-    private rawTranslate(diff: vec3) {
+    /**
+     * helper to translate the tetracube by a given value
+     *
+     * @param diff {vec3} how much to translate the tetracube by
+     */
+    private rawTranslate(diff: vec3): void {
         glm.vec3.add(this.position, this.position, diff);
         glm.mat4.translate(this.translation, this.translation, diff);
     }
 
+    /**
+     * helper to translate the tetracube by a given value and check for collisions
+     * If a collision of the expected type took place, the translation will be undone
+     *
+     * @param diff {vec3} how much to translate the tetracube by
+     * @param expectedCollision {CollisionEvent} the collision events to check for
+     */
     private translate(
         diff: vec3,
         expectedCollision: CollisionEvent,
@@ -180,19 +240,46 @@ export class Tetracube {
         return collision;
     }
 
+    /**
+     * translate the tetracube in X direction
+     * wont have any effect if a wall or other piece would have been hit (CollisionEvent.SIDES)
+     *
+     * @param amount {number} how much to translate by
+     * @returns {CollisionEvent} the collision that occured
+     */
     translateX(amount: number): CollisionEvent {
         return this.translate([amount, 0, 0], CollisionEvent.SIDES);
     }
 
+    /**
+     * translate the tetracube in Y direction
+     * wont have any effect if the bottom would have been hit (CollisionEvent.BOTTOM)
+     *
+     * @param amount {number} how much to translate by
+     * @returns {CollisionEvent} the collision that occured
+     */
     translateY(amount: number): CollisionEvent {
         return this.translate([0, amount, 0], CollisionEvent.BOTTOM);
     }
 
+    /**
+     * translate the tetracube in Z direction
+     * wont have any effect if a wall or other piece would have been hit (CollisionEvent.SIDES)
+     *
+     * @param amount {number} how much to translate by
+     * @returns {CollisionEvent} the collision that occured
+     */
     translateZ(amount: number): CollisionEvent {
         return this.translate([0, 0, amount], CollisionEvent.SIDES);
     }
 
-    private rawRotate(rad: number, axis: vec3) {
+    /**
+     * Helper to rotate the object by the given degrees around the given axis
+     *
+     * @param rad {number} the radians to rotate by
+     * @param axis {vec3} the axis to rotate around
+     */
+    private rawRotate(rad: number, axis: vec3): void {
         const inv = glm.mat4.create();
         const old = glm.mat4.clone(this.rotation);
         glm.mat4.transpose(inv, this.rotation); // rot matrix is orthogonal so transpose is inverse
@@ -217,6 +304,14 @@ export class Tetracube {
         glm.mat4.multiply(this.rotation, this.rotation, old);
     }
 
+    /**
+     * helper to rotate the tetracube by a given degree around a given axis and check for collisions
+     * If the block would collide with the sides or the top, the rotation will be undone
+     *
+     * @param deg {number} the number of degrees to rotate by
+     * @param axis {vec3} the axis around which to rotate
+     * @returns {CollisionEvent} the collision that occured
+     */
     private rotate(deg: number, axis: vec3): CollisionEvent {
         const temp = glm.mat4.clone(this.rotation);
         this.rawRotate(glm.glMatrix.toRadian(deg), axis);
@@ -231,22 +326,55 @@ export class Tetracube {
         return collision;
     }
 
+    /**
+     * rotate the tetracube by a given degree around the X-axis
+     * If the block would collide with the sides or the top, this will have no effect
+     *
+     * @param deg {number} the number of degrees to rotate by
+     * @returns {CollisionEvent} the collision that occured
+     */
     rotateX(deg: number): CollisionEvent {
         return this.rotate(deg, AXIS.X);
     }
 
+    /**
+     * rotate the tetracube by a given degree around the Y-axis
+     * If the block would collide with the sides or the top, this will have no effect
+     *
+     * @param deg {number} the number of degrees to rotate by
+     * @returns {CollisionEvent} the collision that occured
+     */
     rotateY(deg: number): CollisionEvent {
         return this.rotate(deg, AXIS.Y);
     }
 
+    /**
+     * rotate the tetracube by a given degree around the Z-axis
+     * If the block would collide with the sides or the top, this will have no effect
+     *
+     * @param deg {number} the number of degrees to rotate by
+     * @returns {CollisionEvent} the collision that occured
+     */
     rotateZ(deg: number): CollisionEvent {
         return this.rotate(deg, AXIS.Z);
     }
 
+    /**
+     * Test if this tetracube collides with any other blocks or the playing field borders
+     *
+     * @param [others=[]] {Array<Tetracube>} the others to collide with
+     * @returns {CollisionEvent} the collision that occured
+     */
     testCollisions(others: Array<Tetracube> = []): CollisionEvent {
         return collisionTest(this, others);
     }
 
+    /**
+     * Test if this tetracube is at the given y-coordinate
+     *
+     * @param yVal {number} the y-coordinate to check at
+     * @returns {boolean} true if tetracube is at the coordinate, false else
+     */
     isAt(yVal: number): boolean {
         const transform = this.getTransform();
         return this.cubes.every((cube) => {
@@ -255,7 +383,12 @@ export class Tetracube {
         });
     }
 
-    removeY(yVal: number) {
+    /**
+     * Remove all cubes from the tetracube that are at the given y-coordinate
+     *
+     * @param yVal {number} the y-coordinate to remove blocks from
+     */
+    removeY(yVal: number): void {
         const transform = this.getTransform();
         this.cubes = this.cubes.filter((cube) => {
             const cubePos = cube.getCoord(transform);
@@ -263,7 +396,12 @@ export class Tetracube {
         });
     }
 
-    moveIfAbove(yVal: number) {
+    /**
+     * Move the tetracube downwards by one if it is above the y-coordinate
+     *
+     * @param yVal {number} the y-coordinate to check against
+     */
+    moveIfAbove(yVal: number): void {
         const transform = this.getTransform();
         const shouldMove = this.cubes.every((cube) => {
             const cubePos = cube.getCoord(transform);
@@ -273,10 +411,21 @@ export class Tetracube {
         if (shouldMove) this.rawTranslate([0, -1, 0]);
     }
 
+    /**
+     * Test if tetracube contains no more cubes
+     *
+     * @returns {boolean} true if tetracube is empty, false else
+     */
     isEmpty(): boolean {
         return this.cubes.length == 0;
     }
 
+    /**
+     * Split the tetracube into a list of tetracubes consisting of only one cube each
+     * the singles will keep their parents translation, rotation, color and texture
+     *
+     * @returns {Array<Tetracube>} the resulting list of tetracubes
+     */
     splitIntoSingles(): Array<Tetracube> {
         const ret = this.cubes.map((cube) => {
             const pos = cube.getCoord(this.getTransform());
@@ -295,7 +444,11 @@ export class Tetracube {
         return ret;
     }
 
-    snapToGrid() {
+    /**
+     * Snap the cube to the nearest gridplaces if it got off-centered somehow
+     * This should never result in a collision if there was no collision before
+     */
+    snapToGrid(): void {
         // reverse centering of coordinate to not disturb rounding
         const [x, y, z] = DIM.size as [number, number, number];
         if (x % 2 == 0) this.position[0] -= 0.5;
@@ -314,6 +467,11 @@ export class Tetracube {
         glm.mat4.translate(this.translation, this.translation, this.position);
     }
 
+    /**
+     * Return the coordinates that the tetracube occupies
+     *
+     * @returns {Array<vec3>} a list of the coordinates
+     */
     getCoordinates(): Array<vec3> {
         const cubes = this.cubes;
         const coordinates: Array<vec3> = [];
@@ -325,6 +483,11 @@ export class Tetracube {
         return coordinates;
     }
 
+    /**
+     * Return the transformation matrix of this tetracube
+     *
+     * @returns {mat4} the transformation matrix
+     */
     getTransform(): mat4 {
         const transformMatrix = glm.mat4.create();
         glm.mat4.multiply(transformMatrix, this.rotation, transformMatrix);
@@ -332,13 +495,31 @@ export class Tetracube {
         return transformMatrix;
     }
 
-    drawCubes(gl: WebGL2RenderingContext, shader: Shader, viewMatrix: mat4) {
+    /**
+     * draw the tetracube with cubes in the given context with the given shader and view matrix
+     *
+     * @param gl {WebGL2RenderingContext} the webgl context
+     * @param shader {Shader} the shder to draw with
+     * @param viewMatrix {mat4} the view matrix to draw with
+     */
+    drawCubes(
+        gl: WebGL2RenderingContext,
+        shader: Shader,
+        viewMatrix: mat4,
+    ): void {
         const transformMatrix = this.getTransform();
         this.cubes.forEach((cube) => {
             cube.drawCube(gl, shader, viewMatrix, transformMatrix);
         });
     }
 
+    /**
+     * draw the tetracube as cylinders in the given context with the given shader and view matrix
+     *
+     * @param gl {WebGL2RenderingContext} the webgl context
+     * @param shader {Shader} the shder to draw with
+     * @param viewMatrix {mat4} the view matrix to draw with
+     */
     drawCylinders(
         gl: WebGL2RenderingContext,
         shader: Shader,

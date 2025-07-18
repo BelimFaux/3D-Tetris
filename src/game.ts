@@ -7,11 +7,14 @@ import { CollisionEvent } from './objects/collision.js';
 import { Grid } from './objects/grid.js';
 import { Tetracube, TetracubeType } from './objects/tetracube.js';
 import { getShader } from './shader.js';
-import { DIM } from './utils/constants.js';
+import { DIM } from './utils/globals.js';
 import { Slider } from './input/slider.js';
 import { BlinkingEffect } from './objects/animation.js';
 import { AxisOverlay } from './objects/axis.js';
 
+/**
+ * Interface for all game related options
+ */
 interface GameOptions {
     gravity: boolean;
     showGrid: boolean;
@@ -22,6 +25,11 @@ interface GameOptions {
     musicPlaying: boolean;
 }
 
+/**
+ * construct an object with the default options for the game
+ *
+ * @returns {GameOptions} the constructed object
+ */
 function defaultOptions(): GameOptions {
     return {
         gravity: true,
@@ -34,6 +42,9 @@ function defaultOptions(): GameOptions {
     };
 }
 
+/**
+ * Class that represents a game of 3d tetris
+ */
 export class Game {
     gl;
     options;
@@ -54,10 +65,15 @@ export class Game {
     movePiecesBy;
     score;
 
+    /**
+     * construct a new game in the given webgl context
+     *
+     * @param gl {WebGL2RenderingContext} the webgl context
+     */
     constructor(gl: WebGL2RenderingContext) {
         this.gl = gl;
         this.options = defaultOptions();
-        this.options.gravity = false;
+        this.options.gravity = false; // before the game starts, the gravity is always off
         this.gameOver = false;
         this.camera = new Camera();
         this.music = new Audio('ressources/sounds/TetriX.wav');
@@ -91,7 +107,10 @@ export class Game {
         ui.updateScore(this.score);
     }
 
-    private spawnNewPiece() {
+    /**
+     * Helper function to spawn a new tetracube at the top of the grid
+     */
+    private spawnNewPiece(): void {
         this.activePiece = new Tetracube(
             [0, DIM.max[1], 0],
             this.nextPiece,
@@ -102,74 +121,16 @@ export class Game {
         ui.updateNextPiece(this.nextPiece);
     }
 
-    startGame() {
-        new MouseHandler(this.camera);
-        new KeyboardHandler(this);
-        this.options.gravity = defaultOptions().gravity;
-        this.spawnNewPiece();
-        this.grid = new Grid();
-        this.grid.initVao(this.gl, this.shader);
-    }
-
-    cheatCode() {
-        this.nextPiece = TetracubeType.IPIECE;
-        this.spawnNewPiece();
-    }
-
-    getActive(): Tetracube {
-        return this.activePiece;
-    }
-
-    toggleGravity() {
-        this.options.gravity = !this.options.gravity;
-    }
-
-    toggleGrid() {
-        this.options.showGrid = !this.options.showGrid;
-    }
-
-    toggleCylinders() {
-        this.options.cylinders = !this.options.cylinders;
-    }
-
-    toggleAxis() {
-        this.options.axisOverlay = !this.options.axisOverlay;
-    }
-
-    toggleMusic() {
-        if (this.options.musicPlaying) this.music.pause();
-        else this.music.play();
-        this.options.musicPlaying = !this.options.musicPlaying;
-    }
-
-    setMusic(playing: boolean) {
-        this.options.musicPlaying = playing;
-        if (this.options.musicPlaying) this.music.play();
-        else this.music.pause();
-    }
-
-    togglePerspective() {
-        const persp = (this.options.perspective = !this.options.perspective);
-        if (persp) this.camera.initPerspective();
-        else this.camera.initOrthogonal();
-    }
-
-    toggleShader() {
-        const gouraud = (this.options.gouraud = !this.options.gouraud);
-        if (gouraud) this.shader = getShader('gouraud');
-        else this.shader = getShader('phong');
-        ui.updateShader(gouraud ? 'gouraud' : 'phong');
-
-        this.activePiece.initVaos(this.gl, this.shader);
-        this.grid.initVao(this.gl, this.shader);
-        this.axis.initVAO(this.gl, this.shader);
-        this.pieces.forEach((piece) => piece.initVaos(this.gl, this.shader));
-    }
-
-    adjustScore(killed: number) {
+    /**
+     * Adjust the score depending on how many rows were killed
+     * Uses the original [BPS scoring system](https://tetris.wiki/Scoring)
+     *
+     * Might also update the score in the ui
+     *
+     * @param killed {number} the number of rows that were killed
+     */
+    private adjustScore(killed: number): void {
         if (killed == 0) return;
-        // Original BPS scoring system:
-        // see https://tetris.wiki/Scoring
         switch (killed) {
             case 1:
                 this.score += 40;
@@ -186,19 +147,11 @@ export class Game {
         ui.updateScore(this.score);
     }
 
-    restartGame() {
-        this.gameOver = false;
-        this.spawnNewPiece();
-        this.pieces = [];
-        this.score = 0;
-        if (this.options.musicPlaying) {
-            this.music.currentTime = 0;
-            this.music.play();
-        }
-        ui.updateScore(this.score);
-    }
-
-    handleLandedPiece() {
+    /**
+     * Handle a landed piece.
+     * Will check for game end and spawn a new piece
+     */
+    private handleLandedPiece(): void {
         if (this.activePiece.testCollisions() & CollisionEvent.TOP) {
             this.gameOver = true;
             this.music.pause();
@@ -212,14 +165,12 @@ export class Game {
         this.spawnNewPiece();
     }
 
-    dropActive() {
-        if (!this.animation.isFinished()) return;
-        // just translate down until something is hit
-        while (!(this.activePiece.translateY(-0.1) & CollisionEvent.BOTTOM)) {}
-        this.handleLandedPiece();
-    }
-
-    gravity(deltaTime: number) {
+    /**
+     * Handle gravity
+     * Drops the active piece by the gravity amount and handles collisions
+     * Will also drop all landed pieces if `this.movePiecesBy` is greater than zero
+     */
+    private gravity(deltaTime: number): void {
         const amount = -deltaTime * 0.001;
         let collision = CollisionEvent.NO_COLLISION;
         if (this.options.gravity)
@@ -238,7 +189,13 @@ export class Game {
         this.handleLandedPiece();
     }
 
-    deleteCol(yVal: number) {
+    /**
+     * Delete all pieces in a row
+     * Might start a new animation for deletion
+     *
+     * @param yVal {number} the y value of the row
+     */
+    private deleteRow(yVal: number): void {
         const cubesToDelete = this.pieces.filter((piece) => piece.isAt(yVal));
         this.pieces = this.pieces.filter((piece) => !piece.isAt(yVal));
         if (this.animation.isFinished())
@@ -246,7 +203,11 @@ export class Game {
         else this.animation.addPieces(cubesToDelete);
     }
 
-    testFullCols() {
+    /**
+     * Test if any rows are full and deletes them.
+     * Will also update score
+     */
+    private testFullRows(): void {
         const targetCount = DIM.size[0] * DIM.size[2];
         const countYMap: Map<number, number> = new Map();
         this.pieces.forEach((piece) => {
@@ -262,7 +223,7 @@ export class Game {
         countYMap.forEach((count, yVal) => {
             if (count >= targetCount) {
                 killed++;
-                this.deleteCol(yVal);
+                this.deleteRow(yVal);
             }
         });
         // tell gravity how many lines landed pieces can move down by
@@ -270,7 +231,10 @@ export class Game {
         this.adjustScore(killed);
     }
 
-    drawObjects() {
+    /**
+     * Draw all objects in the current webgl context using the current shader
+     */
+    private drawObjects(): void {
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 
         const viewMatrix = this.camera.getView();
@@ -311,14 +275,151 @@ export class Game {
             this.axis.draw(this.gl, this.shader, viewMatrix);
     }
 
-    tick(deltaTime: number) {
+    /**
+     * Advance the game
+     *
+     * @param deltaTime {number} the time passed since the last tick
+     */
+    tick(deltaTime: number): void {
         if (this.gameOver) return;
         if (this.animation.isFinished()) {
             this.gravity(deltaTime);
-            this.testFullCols();
+            this.testFullRows();
         } else {
             this.animation.tick(deltaTime);
         }
         this.drawObjects();
+    }
+
+    /**
+     * Drop the active piece until it collides with something on the bottom
+     * Wont have any effect if an animation is currently playing
+     */
+    dropActive(): void {
+        if (!this.animation.isFinished()) return;
+        // just translate down until something is hit
+        while (!(this.activePiece.translateY(-0.1) & CollisionEvent.BOTTOM)) {}
+        this.handleLandedPiece();
+    }
+
+    /**
+     * Restart the game by resetting the score and clearing all landed pieces
+     *
+     * Will also update the score in the ui
+     */
+    restartGame(): void {
+        this.gameOver = false;
+        this.spawnNewPiece();
+        this.pieces = [];
+        this.score = 0;
+        if (this.options.musicPlaying) {
+            this.music.currentTime = 0;
+            this.music.play();
+        }
+        ui.updateScore(this.score);
+    }
+
+    /**
+     * Starts the game, by initilizing the inputhandlers and setting gravity to it's default value
+     * Will also reinitialize the grid and the first piece, because the dimensions might have changed
+     */
+    startGame(): void {
+        new MouseHandler(this.camera);
+        new KeyboardHandler(this);
+        this.options.gravity = defaultOptions().gravity;
+        this.spawnNewPiece();
+        this.grid = new Grid();
+        this.grid.initVao(this.gl, this.shader);
+    }
+
+    /**
+     * Spawn an I-piece
+     */
+    cheatCode(): void {
+        this.nextPiece = TetracubeType.IPIECE;
+        this.spawnNewPiece();
+    }
+
+    /**
+     * returns the active piece
+     */
+    getActive(): Tetracube {
+        return this.activePiece;
+    }
+
+    /**
+     * toggle the gravity
+     */
+    toggleGravity(): void {
+        this.options.gravity = !this.options.gravity;
+    }
+
+    /**
+     * toggle the grid
+     * Will show the whole grid if enabled or just the sides facing away else
+     */
+    toggleGrid(): void {
+        this.options.showGrid = !this.options.showGrid;
+    }
+
+    /**
+     * toggle cylinders
+     * Will render the tetracubes with cylinders instead of cubes
+     */
+    toggleCylinders(): void {
+        this.options.cylinders = !this.options.cylinders;
+    }
+
+    /**
+     * toggle axis overlay
+     * this will overlay the games coordinate axis over the active piece
+     */
+    toggleAxis(): void {
+        this.options.axisOverlay = !this.options.axisOverlay;
+    }
+
+    /**
+     * toggle music
+     * pause and unpause the music playing in the background
+     */
+    toggleMusic(): void {
+        if (this.options.musicPlaying) this.music.pause();
+        else this.music.play();
+        this.options.musicPlaying = !this.options.musicPlaying;
+    }
+
+    /**
+     * set music to a specific value to pause and unpause the music playing in the background
+     *
+     * @param playing {boolean} true if the music should play, false if not
+     */
+    setMusic(playing: boolean): void {
+        this.options.musicPlaying = playing;
+        if (this.options.musicPlaying) this.music.play();
+        else this.music.pause();
+    }
+
+    /**
+     * toggle between perspective and orthographic view
+     */
+    togglePerspective(): void {
+        const persp = (this.options.perspective = !this.options.perspective);
+        if (persp) this.camera.initPerspective();
+        else this.camera.initOrthogonal();
+    }
+
+    /**
+     * toggle between gouraud and phong shader to be used for rendering
+     */
+    toggleShader(): void {
+        const gouraud = (this.options.gouraud = !this.options.gouraud);
+        if (gouraud) this.shader = getShader('gouraud');
+        else this.shader = getShader('phong');
+        ui.updateShader(gouraud ? 'gouraud' : 'phong');
+
+        this.activePiece.initVaos(this.gl, this.shader);
+        this.grid.initVao(this.gl, this.shader);
+        this.axis.initVAO(this.gl, this.shader);
+        this.pieces.forEach((piece) => piece.initVaos(this.gl, this.shader));
     }
 }

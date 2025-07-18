@@ -1,6 +1,9 @@
 import type { Camera } from '../camera.js';
 import * as glm from '../gl-matrix/index.js';
 
+/**
+ * Class that handles mouse events
+ */
 export class MouseHandler {
     canvas;
     viewTransform;
@@ -14,6 +17,12 @@ export class MouseHandler {
     scrollX: number = 0;
     scrollY: number = 0;
 
+    /**
+     * initialize the mouse handler for a given camera
+     * the object does not have to be kept, but will instead be active until new mouse event listeners are registered for the canvas
+     *
+     * @param camera {Camera} the camera for the mouse handler
+     */
     constructor(camera: Camera) {
         this.canvas = document.getElementById('canvas') as HTMLCanvasElement;
         this.viewTransform = camera.getTransform();
@@ -25,19 +34,32 @@ export class MouseHandler {
         window.addEventListener('wheel', (ev) => this.scroll(ev));
     }
 
-    private scroll(ev: WheelEvent) {
+    /**
+     * handle scroll events
+     */
+    private scroll(ev: WheelEvent): void {
         if (ev.deltaY > 0) this.camera.zoomOut();
         else this.camera.zoomIn();
     }
 
-    private startMove(ev: MouseEvent) {
-        this.lastX = this.getYPos(ev);
+    /**
+     * start tracking the mouse movement
+     *
+     * @param ev {MouseEvent} the corresponding mouse event
+     */
+    private startMove(ev: MouseEvent): void {
+        this.lastX = this.getXPos(ev);
         this.trackingMouse = true;
     }
 
-    private whileMove(ev: MouseEvent) {
+    /**
+     * handler for mouse movement while tracking
+     *
+     * @param ev {MouseEvent} the mouse event
+     */
+    private whileMove(ev: MouseEvent): void {
         if (!this.trackingMouse) return;
-        const cur = this.getYPos(ev);
+        const cur = this.getXPos(ev);
         const d = cur - this.lastX;
 
         if (Math.abs(d) > 0.001) {
@@ -51,11 +73,22 @@ export class MouseHandler {
         }
     }
 
+    /**
+     * stop tracking mouse movement
+     *
+     * @param _ {MouseEvent} unused
+     */
     private stopMove(_: MouseEvent) {
         this.trackingMouse = false;
     }
 
-    private getYPos(ev: MouseEvent) {
+    /**
+     * Calculate the x position of the mouse on the canvas
+     *
+     * @param ev {MouseEvent} the mouse event
+     * @returns {number} the x position of the mouse on the canvas
+     */
+    private getXPos(ev: MouseEvent): number {
         return ev.clientX / this.canvas.width;
     }
 }

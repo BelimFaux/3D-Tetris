@@ -17,6 +17,13 @@ export function resizeCanvas(canvas: HTMLCanvasElement): void {
     }
 }
 
+/**
+ * creates a webgl texture for the given context from an image
+ *
+ * @param gl {WebGL2RenderingContext} the webgl context
+ * @param img {HTMLImageElement} the image for the texture
+ * @returns {WebGLTexture} the created texture
+ */
 export function createTexture(
     gl: WebGL2RenderingContext,
     img: HTMLImageElement,
@@ -35,6 +42,9 @@ export function createTexture(
     return texture;
 }
 
+/**
+ * Helper to determine if a value is a power of two
+ */
 function isPowerOfTwo(value: number) {
     return (value & (value - 1)) === 0;
 }

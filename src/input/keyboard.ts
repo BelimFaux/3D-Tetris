@@ -2,11 +2,20 @@ import * as glm from '../gl-matrix/index.js';
 
 import type { Game } from '../game.js';
 
+/**
+ * Class that handles keyboard presses
+ */
 export class KeyboardHandler {
     keySet: Set<string>;
     game;
     canvas;
 
+    /**
+     * initialize the keyboard handler for a given game
+     * the object does not have to be kept, but will instead be active until new keydown/keyup event listeners are registered for the canvas
+     *
+     * @param game {Game} the game for the keyboard handler
+     */
     constructor(game: Game) {
         this.canvas = document.getElementById('canvas') as HTMLCanvasElement;
         this.game = game;
@@ -22,7 +31,10 @@ export class KeyboardHandler {
         });
     }
 
-    private movementHandler() {
+    /**
+     * handle movement related key events
+     */
+    private movementHandler(): void {
         if (this.keySet.has('d') || this.keySet.has('ArrowRight'))
             this.game.getActive().translateX(1);
 
@@ -57,6 +69,9 @@ export class KeyboardHandler {
         if (this.keySet.has('.') && this.keySet.has(',')) this.game.cheatCode();
     }
 
+    /**
+     * handle view related key events
+     */
     private viewHandler() {
         const viewTransform = this.game.camera.getTransform();
         const rad = glm.glMatrix.toRadian(5);

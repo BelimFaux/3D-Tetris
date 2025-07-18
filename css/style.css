@@ -1,3 +1,4 @@
+/* Colorscheme */
 :root {
     --bg-color: #1e1e2e;
     --text-color: #cdd6f4;
@@ -18,35 +19,6 @@ body {
     background-color: var(--bg-color);
     color: var(--text-color);
     font-family: 'Inter', sans-serif;
-}
-
-details {
-    padding: 5px;
-}
-
-details h1 {
-    padding-bottom: 0;
-    padding-left: 0;
-    font-size: large;
-}
-
-details ul {
-    font-size: medium;
-    padding: 0;
-    padding-left: 10px;
-    list-style-position: outside;
-}
-
-.xaxis {
-    color: var(--red);
-}
-
-.yaxis {
-    color: var(--blue);
-}
-
-.zaxis {
-    color: var(--green);
 }
 
 #canvas {
@@ -79,15 +51,33 @@ details ul {
     margin: 20px;
 }
 
-#info {
-    margin-bottom: 10px;
+.xaxis {
+    color: var(--red);
 }
 
-#deltaTime {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    margin: 20px;
+.yaxis {
+    color: var(--blue);
+}
+
+.zaxis {
+    color: var(--green);
+}
+
+details {
+    padding: 5px;
+}
+
+details h1 {
+    padding-bottom: 0;
+    padding-left: 0;
+    font-size: large;
+}
+
+details ul {
+    font-size: medium;
+    padding: 0;
+    padding-left: 10px;
+    list-style-position: outside;
 }
 
 .widget {
@@ -97,6 +87,17 @@ details ul {
     border-radius: 10px;
     padding-left: 25px;
     padding-right: 25px;
+}
+
+#info {
+    margin-bottom: 10px;
+}
+
+#deltaTime {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    margin: 20px;
 }
 
 .floatingwidget {

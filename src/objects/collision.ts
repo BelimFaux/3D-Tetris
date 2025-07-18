@@ -1,6 +1,6 @@
 import * as glm from '../gl-matrix/index.js';
 
-import { DIM } from '../utils/constants.js';
+import { DIM } from '../utils/globals.js';
 import { Tetracube } from './tetracube.js';
 
 /*
@@ -16,13 +16,24 @@ export enum CollisionEvent {
     TOP = 8,
 }
 
+/**
+ * Class to represent a cube in the grid as a list of coordinates
+ */
 class GridCube {
     coordinates;
 
+    /**
+     * construct a new gridcube from a list of coordinates
+     */
     constructor(coordinates: Array<vec3>) {
         this.coordinates = coordinates;
     }
 
+    /**
+     * Test if the cube collides with the grid sides
+     *
+     * @returns {boolean} true if it collides, false else
+     */
     collisionSides(): boolean {
         const min = DIM.min;
         const max = DIM.max;
@@ -35,6 +46,11 @@ class GridCube {
         });
     }
 
+    /**
+     * Test if the cube collides with the grid top
+     *
+     * @returns {boolean} true if it collides, false else
+     */
     collisionTop(): boolean {
         return this.coordinates.every((coord) => {
             const [_x, y, _z] = coord as [number, number, number];
@@ -43,6 +59,11 @@ class GridCube {
         });
     }
 
+    /**
+     * Test if the cube collides with the grid bottom
+     *
+     * @returns {boolean} true if it collides, false else
+     */
     collisionBottom(): boolean {
         return this.coordinates.every((coord) => {
             const [_x, y, _z] = coord as [number, number, number];
@@ -51,6 +72,12 @@ class GridCube {
         });
     }
 
+    /**
+     * Test if the cube collides with another piece
+     *
+     * @param other {GridCube} the other cube to collide with
+     * @returns {CollisionEvent} the collision event
+     */
     collisionOtherPiece(other: GridCube): CollisionEvent {
         for (let i = 0; i < this.coordinates.length; i++) {
             const thisCoord = this.coordinates[i] as vec3;
@@ -64,6 +91,13 @@ class GridCube {
     }
 }
 
+/**
+ * Helper function to determine if two coordinates are in the same cell
+ *
+ * @param lhs {vec3} first coordinate
+ * @param rhs {vec3} second coordinate
+ * @returns {boolean} true if the coordinates are in the same cell, else false
+ */
 function overlaps(lhs: vec3, rhs: vec3): boolean {
     const [x1, y1, z1] = lhs as [number, number, number];
     const [x2, y2, z2] = rhs as [number, number, number];
@@ -74,6 +108,13 @@ function overlaps(lhs: vec3, rhs: vec3): boolean {
     return false;
 }
 
+/**
+ * Test if a Tetracube collides with other Tetracubes or the grid
+ *
+ * @param piece {Tetracube} piece to check collisions for
+ * @param against {Array<Tetracube>} other tetracube to check against
+ * @returns {CollisionEvent} the collisions that occured
+ */
 export function collisionTest(
     piece: Tetracube,
     against: Array<Tetracube>,

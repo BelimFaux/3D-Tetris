@@ -42,6 +42,11 @@ export function getFile(path: string): string {
     return ret || '';
 }
 
+/**
+ * preload an image from the path
+ *
+ * @param {string} path - the path of the image
+ */
 export function addImage(path: string): void {
     imagePromises.push(
         new Promise((resolve) => {
@@ -53,6 +58,11 @@ export function addImage(path: string): void {
     );
 }
 
+/**
+ * load all textures into the given webgl context
+ *
+ * @param gl {WebGL2RenderingContext} the webgl context
+ */
 export async function loadAllTextures(
     gl: WebGL2RenderingContext,
 ): Promise<void> {
@@ -63,6 +73,13 @@ export async function loadAllTextures(
     });
 }
 
+/**
+ * Return a preloaded texture
+ * will report any errors directly to the ui
+ *
+ * @param path {string} the path of the image for the texture
+ * @returns {WebGLTexture} the texture or -1 on failure
+ */
 export function getTexture(path: string): WebGLTexture {
     const ret = textureMap.get(path);
     if (!ret) {

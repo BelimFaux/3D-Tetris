@@ -28,9 +28,9 @@ export class Shader {
     locUSpecular: WebGLUniformLocation = -1;
 
     /**
-     * initialize a new shader program in a gl context
+     * initialize a new shader program in a webgl context
      *
-     * @param {WebGL2RenderingContext} gl - the gl context that should be used
+     * @param {WebGL2RenderingContext} gl - the webgl context that should be used
      */
     constructor(gl: WebGL2RenderingContext) {
         this.gl = gl;
@@ -42,7 +42,8 @@ export class Shader {
      *
      * @param {string} source - glsl source code for the shader
      * @param {GLenum} type - the type of the shader
-     * @returns {ProgramBuilder} the 'this' object
+     * @returns {Shader} the 'this' object for chaining calls
+     * @throws an error message if the compilation fails
      */
     public addShader(source: string, type: GLenum): Shader {
         const shader = this.gl.createShader(type);
@@ -65,9 +66,10 @@ export class Shader {
     }
 
     /**
-     * link the program
+     * link the program and initialize all locations of attributes and uniforms
      *
      * @returns {WebGLProgram} a finished WebGLProgram
+     * @throws an error message if the linking fails
      */
     public link(): Shader {
         this.gl.linkProgram(this.program);
@@ -123,7 +125,7 @@ export class Shader {
     }
 
     /**
-     * Passes the projection and view matrices to the shader program.
+     * Passes the projection matrix to the shader program.
      *
      * @param {WebGL2RenderingContext} gl - The WebGL context.
      * @param {mat4} projectionMatrix - The projection matrix.
@@ -136,13 +138,18 @@ export class Shader {
     }
 
     /**
-     * bind the program to the current WebGL Context
+     * bind the program to its current WebGL Context
      */
     public bind(): void {
         this.gl.useProgram(this.program);
     }
 
-    initCoefficients(sliders: Slider) {
+    /**
+     * Initialize coefficients from the ui sliders
+     *
+     * @param sliders {Slider} the object that watches the sliders
+     */
+    initCoefficients(sliders: Slider): void {
         if (this.locUAmbient != -1) {
             this.gl.uniform1f(
                 this.locUAmbient,
@@ -164,6 +171,7 @@ export class Shader {
     }
 }
 
+// map for caching all shaders
 const shaderMap = new Map<string, Shader>();
 
 /**
@@ -171,7 +179,7 @@ const shaderMap = new Map<string, Shader>();
  *
  * @param gl {WebGL2RenderingContext} - the WebGl context
  */
-export function loadShaders(gl: WebGL2RenderingContext) {
+export function loadShaders(gl: WebGL2RenderingContext): void {
     for (const name of availableShaders) {
         const shader = loadShader(gl, name);
         if (shader) {
@@ -180,6 +188,13 @@ export function loadShaders(gl: WebGL2RenderingContext) {
     }
 }
 
+/**
+ * retrieve a precached shader from the shader map
+ *
+ * @param name {string} the name of the shader
+ * @returns {Shader} the corresponding shader object
+ * @throws an error message if the name is not present in the shader map
+ */
 export function getShader(name: string): Shader {
     const ret = shaderMap.get(name);
     if (!ret) {
@@ -191,9 +206,11 @@ export function getShader(name: string): Shader {
 /**
  * Load a shader from the name.
  * the files are assumed to be located at 'shaders/{name}.(vert|frag)'
+ * If an error occurs this method will report the error to the ui
  *
  * @param gl {WebGL2RenderingContext} - the WebGl context
  * @param name {string} - the name of the shader
+ * @returns {Shader | null} the shader if it could be compiled or null
  */
 function loadShader(gl: WebGL2RenderingContext, name: string): Shader | null {
     // load shader source

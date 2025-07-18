@@ -43,7 +43,7 @@ export class AxisOverlay {
     /**
      * Initialize axis overlay with or without a current shape
      *
-     * @param shape {Shape | null=} - the current shape for the overlay
+     * @param game {Game} the game for the overlay
      */
     constructor(game: Game) {
         this.game = game;
@@ -52,8 +52,8 @@ export class AxisOverlay {
     /**
      * Initializes a Vertex Array Object for the overlay and creates and binds the necessary buffers to draw the object with the provided shader.
      *
-     * @param gl {WebGL2RenderingContext} - The webgl context
-     * @param shader {Shader} - The shader object with which the overlay should be drawn
+     * @param gl {WebGL2RenderingContext} the webgl context
+     * @param shader {Shader} the shader object with which the overlay should be drawn
      */
     initVAO(gl: WebGL2RenderingContext, shader: Shader): void {
         this.vaoIndex = gl.createVertexArray();
@@ -84,8 +84,10 @@ export class AxisOverlay {
      * Draw the overlay on top of the selected shape with the given shader
      * If no shape is selected, nothing is rendered
      *
-     * @param gl {WebGL2RenderingContext} - The webgl context
-     * @param shader {Shader} - The shader object with which the overlay should be drawn
+     * @param gl {WebGL2RenderingContext} The webgl context
+     * @param shader {Shader} The shader object with which the overlay should be drawn
+     * @param viewMatrix {mat4} the view matrix of the world
+     * @param [scaleFactor=1.5] {number} the factor by which to scale the axis
      */
     draw(
         gl: WebGL2RenderingContext,

@@ -1,25 +1,38 @@
 import * as glm from '../gl-matrix/index.js';
 
-import { DIM } from '../utils/constants.js';
+import { DIM } from '../utils/globals.js';
 
 import type { Shader } from '../shader';
 import type { Camera } from '../camera.js';
 
+// color of the grid
 const GRID_COLOR = [1, 1, 1, 1];
 
+/**
+ * A grid element that lies in one plane
+ */
 class GridElement {
     vertices;
     indices;
     midpoint;
     vaoIndex: WebGLVertexArrayObject = -1;
 
+    /**
+     * Construct a new gid element that from the vertices and indices with the given midpoint
+     */
     constructor(vertices: Float32Array, indices: Uint16Array, midpoint: vec3) {
         this.vertices = vertices;
         this.indices = indices;
         this.midpoint = midpoint;
     }
 
-    initVao(gl: WebGL2RenderingContext, shader: Shader) {
+    /**
+     * Initialize the vertex array for the webgl context for the shader
+     *
+     * @param gl {WebGL2RenderingContext} th webgl context
+     * @param shader {Shader} the shader
+     */
+    initVao(gl: WebGL2RenderingContext, shader: Shader): void {
         this.vaoIndex = gl.createVertexArray();
         gl.bindVertexArray(this.vaoIndex);
 
@@ -45,12 +58,20 @@ class GridElement {
         gl.vertexAttribPointer(shader.locAColor, 3, gl.FLOAT, false, 0, 0);
     }
 
+    /**
+     * Draw the grid element if it does not block the view from the camera position to the midpoint
+     *
+     * @param gl {WebGL2RenderingContext} the webgl context
+     * @param shader {Shader} the shader
+     * @param globalTransformationMatrix {mat4} a matrix containing all global transformations
+     * @param camPos {vec3} the camera position in world space
+     */
     maybeDraw(
         gl: WebGL2RenderingContext,
         shader: Shader,
         globalTransformationMatrix: mat4,
         camPos: vec3,
-    ) {
+    ): void {
         const mid = glm.vec3.clone(this.midpoint);
         glm.vec3.transformMat4(mid, mid, globalTransformationMatrix);
 
@@ -59,13 +80,20 @@ class GridElement {
         this.draw(gl, shader);
     }
 
-    draw(gl: WebGL2RenderingContext, shader: Shader) {
+    /**
+     * Draw the grid element
+     *
+     * @param gl {WebGL2RenderingContext} the webgl context
+     * @param shader {Shader} the shader
+     */
+    draw(gl: WebGL2RenderingContext, shader: Shader): void {
         shader.bind();
         gl.bindVertexArray(this.vaoIndex);
         gl.drawElements(gl.LINES, this.indices.length, gl.UNSIGNED_SHORT, 0);
     }
 }
 
+// type alias for function that maps point to another point
 type PointMapper = (a: number, b: number, c: number) => number[];
 
 /**
@@ -118,6 +146,14 @@ function constructABCGrid(
     );
 }
 
+/**
+ * Construct a grid in the xz-plane with the given sizes at the given y-coordinate
+ *
+ * @param xSize {number} the size in the x dimension
+ * @param zSize {number} the size in the z dimension
+ * @param yVal {number} the y-coordinate
+ * @returns {GridElement} the constructed grid
+ */
 function constructXZGrid(
     xSize: number,
     zSize: number,
@@ -130,6 +166,15 @@ function constructXZGrid(
         (a: number, b: number, c: number) => [a, c, b],
     );
 }
+
+/**
+ * Construct a grid in the xy-plane with the given sizes at the given z-coordinate
+ *
+ * @param xSize {number} the size in the x dimension
+ * @param ySize {number} the size in the y dimension
+ * @param zVal {number} the y-coordinate
+ * @returns {GridElement} the constructed grid
+ */
 function constructXYGrid(
     xSize: number,
     ySize: number,
@@ -143,6 +188,14 @@ function constructXYGrid(
     );
 }
 
+/**
+ * Construct a grid in the zy-plane with the given sizes at the given x-coordinate
+ *
+ * @param ySize {number} the size in the y dimension
+ * @param zSize {number} the size in the z dimension
+ * @param xVal {number} the x-coordinate
+ * @returns {GridElement} the constructed grid
+ */
 function constructZYGrid(
     ySize: number,
     zSize: number,
@@ -156,6 +209,9 @@ function constructZYGrid(
     );
 }
 
+/**
+ * Class to represent a full grid (with all sides)
+ */
 export class Grid {
     bottom: GridElement;
     top: GridElement;
@@ -164,6 +220,10 @@ export class Grid {
     left: GridElement;
     right: GridElement;
 
+    /**
+     * Create a new grid
+     * will take its size from the DIM global variable
+     */
     constructor() {
         const [sizeX, sizeY, sizeZ] = DIM.size as [number, number, number];
         const [minX, minY, minZ] = DIM.min as [number, number, number];
@@ -179,7 +239,13 @@ export class Grid {
         this.right = constructZYGrid(sizeY, sizeZ, maxX);
     }
 
-    initVao(gl: WebGL2RenderingContext, shader: Shader) {
+    /**
+     * Initialize all vertex array for the webgl context for the shader
+     *
+     * @param gl {WebGL2RenderingContext} the webgl context
+     * @param shader {Shader} the shader
+     */
+    initVao(gl: WebGL2RenderingContext, shader: Shader): void {
         this.bottom.initVao(gl, shader);
         this.top.initVao(gl, shader);
         this.back.initVao(gl, shader);
@@ -188,7 +254,18 @@ export class Grid {
         this.right.initVao(gl, shader);
     }
 
-    maybeDraw(gl: WebGL2RenderingContext, shader: Shader, camera: Camera) {
+    /**
+     * Draw only the grid elements that don't block the view from the camera position to the midpoint
+     *
+     * @param gl {WebGL2RenderingContext} the webgl context
+     * @param shader {Shader} the shader
+     * @param camera {Camera} the camera of the scene
+     */
+    maybeDraw(
+        gl: WebGL2RenderingContext,
+        shader: Shader,
+        camera: Camera,
+    ): void {
         const viewMatrix = camera.getView();
         const camPos = camera.getEye();
         const transformationMatrix = camera.getTransform();
@@ -203,7 +280,14 @@ export class Grid {
         this.right.maybeDraw(gl, shader, transformationMatrix, camPos);
     }
 
-    draw(gl: WebGL2RenderingContext, shader: Shader, viewMatrix: mat4) {
+    /**
+     * Draw the grid
+     *
+     * @param gl {WebGL2RenderingContext} the webgl context
+     * @param shader {Shader} the shader
+     * @param viewMatrix {mat4} the view matrix to draw with
+     */
+    draw(gl: WebGL2RenderingContext, shader: Shader, viewMatrix: mat4): void {
         shader.bind();
         gl.uniformMatrix4fv(shader.locUTransform, false, viewMatrix);
 

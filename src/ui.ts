@@ -1,6 +1,6 @@
 import type { Game } from './game.js';
 import { TetracubeType } from './objects/tetracube.js';
-import { setDimension } from './utils/constants.js';
+import { setDimension } from './utils/globals.js';
 
 /**
  * Alert the user that an error occured and also prints it to the console.
@@ -8,7 +8,7 @@ import { setDimension } from './utils/constants.js';
  * @param {string} errorMessage - the message that should be reported
  */
 export function reportError(errorMessage: string): void {
-    alert(errorMessage);
+    alert(`Oops, an error occured. Error message was:\n${errorMessage}`);
     console.error(errorMessage);
 }
 
@@ -72,6 +72,12 @@ export function setValue(id: string, value: any): void {
     }
 }
 
+/**
+ * Helper function to set a popup (element with id suffix 'Popup') to the given visibility
+ *
+ * @param popupname {string} - the id prefix (e.g. for id 'testPopup' it should be 'test')
+ * @param visibility {string} - the visibility to set the element to ('visible' / 'hidden')
+ */
 function setPopUp(popupname: string, visibility: string): void {
     const popUp = document.getElementById(popupname + 'Popup');
     if (popUp) {
@@ -79,15 +85,31 @@ function setPopUp(popupname: string, visibility: string): void {
     }
 }
 
+/**
+ * Opens the Game over popup and displays the final score
+ *
+ * @param finalScore {number} the score to display
+ */
 export function openGameoverPopUp(finalScore: number): void {
     setPopUp('gameover', 'visible');
     setValue('finalScoreVal', finalScore);
 }
 
+/**
+ * Opens the start popup
+ */
 export function openStartPopUp(): void {
     setPopUp('start', 'visible');
 }
 
+/**
+ * Registers the game object with the new game and restart popups.
+ * If this function is not called, the new game buttons won't have any effect on the game.
+ *
+ * Might change the dimensions of the grid, so the grid and objects of the game might have to be reinitilized
+ *
+ * @param game {Game} the game object to register
+ */
 export function registerGame(game: Game): void {
     const newGameButton = document.getElementById('newgame');
     if (newGameButton) {
