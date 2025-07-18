@@ -22,7 +22,7 @@ export function reportError(errorMessage: string): void {
  * @param {number} deltaTime - current deltaTime
  */
 export function updateTime(deltaTime: number): void {
-    setValue('deltaTime', `time per frame: ${deltaTime}ms`);
+    setValue('deltaTime', `${deltaTime} ms/frame`);
 }
 
 /**
@@ -31,7 +31,7 @@ export function updateTime(deltaTime: number): void {
  * @param {string} selected - name of the current shader
  */
 export function updateShader(selected: string): void {
-    setValue('shader', `current shader: ${selected}`);
+    setValue('shader', `current: ${selected}`);
 }
 
 /**

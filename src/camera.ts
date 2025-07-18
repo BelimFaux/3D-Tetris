@@ -12,7 +12,7 @@ export class Camera {
     constructor() {
         this.projectionMatrix = glm.mat4.create();
         this.viewMatrix = glm.mat4.create();
-        this.eye = glm.vec3.fromValues(0.0, 12.0, 0.0);
+        this.eye = glm.vec3.fromValues(7.0, 5.0, 7.0);
         this.viewTransforms = glm.mat4.create();
 
         this.halfWorldWidth = 15.0;

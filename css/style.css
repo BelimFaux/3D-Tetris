@@ -1,8 +1,52 @@
+:root {
+    --bg-color: #1e1e2e;
+    --text-color: #cdd6f4;
+    --widget-bg: #3132445c;
+    --widget-border: #45475a;
+    --widget-hover: #313244b6;
+
+    --red: #f38ba8;
+    --blue: #89b4fa;
+    --green: #a6e3a1;
+    --error: #da6052;
+}
+
 html,
 head,
 body {
     margin: 0;
-    background-color: #0e364f;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Inter', sans-serif;
+}
+
+details {
+    padding: 5px;
+}
+
+details h1 {
+    padding-bottom: 0;
+    padding-left: 0;
+    font-size: large;
+}
+
+details ul {
+    font-size: medium;
+    padding: 0;
+    padding-left: 10px;
+    list-style-position: outside;
+}
+
+.xaxis {
+    color: var(--red);
+}
+
+.yaxis {
+    color: var(--blue);
+}
+
+.zaxis {
+    color: var(--green);
 }
 
 #canvas {
@@ -13,20 +57,12 @@ body {
     top: 0;
     z-index: -1;
 
-    background-color: #da6052; /* aggressive background color so errors are more noticable */
-}
-
-#error-box {
-    color: #fd8080;
-    font-weight: 400;
-    font-size: 15pt;
-    padding: 25px;
-    margin-bottom: 20px;
+    /* aggressive background color so errors are more noticable */
+    background-color: var(--error);
 }
 
 #right {
     float: right;
-    color: #eee;
     width: fit-content;
     align-content: right;
     font-weight: 400;
@@ -36,8 +72,8 @@ body {
 
 #left {
     float: left;
-    color: #eee;
     width: fit-content;
+    align-content: left;
     font-weight: 400;
     font-size: 15pt;
     margin: 20px;
@@ -47,18 +83,20 @@ body {
     margin-bottom: 10px;
 }
 
+#deltaTime {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    margin: 20px;
+}
+
 .widget {
-    background-color: rgba(0.2, 0.2, 0.2, 0.3);
+    background-color: var(--widget-bg);
     width: fit-content;
-    border: 1px solid white;
+    border: 1px solid var(--widget-border);
     border-radius: 10px;
     padding-left: 25px;
     padding-right: 25px;
-}
-
-.error-box-title {
-    color: #eee;
-    border-bottom: 1px solid gray;
 }
 
 .floatingwidget {
@@ -71,20 +109,18 @@ body {
     width: 400px;
     height: fit-content;
 
-    background-color: #0e364f;
-    border: 1px solid white;
+    background-color: var(--bg-color);
+    border: 1px solid var(--widget-border);
     border-radius: 10px;
     padding: 10px;
 }
 
 #finalscore {
-    color: #eee;
     text-align: center;
 }
 
 #gameover {
     font-family: 'Inter', sans-serif;
-    color: #eee;
     text-align: center;
     font-size: 30px;
     padding-top: 15px;
@@ -92,9 +128,9 @@ body {
 
 #newgame {
     display: block;
-    color: #eee;
-    background-color: rgba(0.2, 0.2, 0.2, 0.3);
-    border: 1px solid white;
+    color: var(--text-color);
+    background-color: var(--widget-bg);
+    border: 1px solid var(--widget-border);
     border-radius: 10px;
     width: fit-content;
     margin: auto;
@@ -105,5 +141,5 @@ body {
 }
 
 #newgame:hover {
-    background-color: rgba(0.2, 0.2, 0.2, 0.6);
+    background-color: var(--widget-hover);
 }

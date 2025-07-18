@@ -41,8 +41,8 @@ async function setup(): Promise<WebGL2RenderingContext | null> {
     resizeCanvas(canvas);
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
-    // set bg color to #0e364f
-    gl.clearColor(0.05, 0.21, 0.31, 1.0);
+    // set bg color to #1e1e2e
+    gl.clearColor(0.118, 0.118, 0.18, 1.0);
 
     gl.clearDepth(1.0);
     gl.enable(gl.DEPTH_TEST);

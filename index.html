@@ -3,7 +3,8 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>GFX - lab 1c</title>
+        <title>3D Tetris</title>
+        <link rel="shortcut icon" href="/favicon.ico" />
         <link href="css/style.css" rel="stylesheet" />
     </head>
     <body>
@@ -14,51 +15,139 @@
 
         <div id="left">
             <div class="widget" id="info">
-                <p id="deltaTime"></p>
-                <p id="shader"></p>
                 <p id="nextPiece"></p>
                 <p id="score"></p>
             </div>
 
-            <p class="widget">
-                Ambient: <output id="ambientOutput">0.2</output><br />
-                <input
-                    type="range"
-                    id="ambientCoefficient"
-                    value="0.2"
-                    min="0"
-                    max="1"
-                    step="0.05" />
-            </p>
+            <details class="widget" id="shaderInfo">
+                <summary>Shader information</summary>
+                <p id="shader"></p>
 
-            <p class="widget">
-                Diffuse: <output id="diffuseOutput">0.7</output><br />
-                <input
-                    type="range"
-                    id="diffuseCoefficient"
-                    value="0.7"
-                    min="0"
-                    max="1"
-                    step="0.05" />
-            </p>
+                Coefficients:
+                <p class="widget">
+                    ambient: <output id="ambientOutput">0.2</output><br />
+                    <input
+                        type="range"
+                        id="ambientCoefficient"
+                        value="0.2"
+                        min="0"
+                        max="1"
+                        step="0.05" />
+                </p>
 
-            <p class="widget">
-                Specular: <output id="specularOutput">0.5</output><br />
-                <input
-                    type="range"
-                    id="specularCoefficient"
-                    value="0.5"
-                    min="0"
-                    max="1"
-                    step="0.05" />
-            </p>
+                <p class="widget">
+                    diffuse: <output id="diffuseOutput">0.7</output><br />
+                    <input
+                        type="range"
+                        id="diffuseCoefficient"
+                        value="0.7"
+                        min="0"
+                        max="1"
+                        step="0.05" />
+                </p>
+
+                <p class="widget">
+                    specular:
+                    <output id="specularOutput">0.5</output><br />
+                    <input
+                        type="range"
+                        id="specularCoefficient"
+                        value="0.5"
+                        min="0"
+                        max="1"
+                        step="0.05" />
+                </p>
+            </details>
         </div>
 
         <div id="right">
-            <div class="widget" id="error-box">
-                <span class="error-box-title">Box for Errors:</span>
-            </div>
+            <details class="widget" id="keybinds">
+                <summary>Keybinds</summary>
+
+                <h1>Movement</h1>
+                <ul>
+                    <li><u>p</u>: (un)pauses the game</li>
+                    <li>
+                        <u>-></u> or <u>d</u>: move in
+                        <b class="xaxis">+x</b> direction
+                    </li>
+                    <li>
+                        <u><-</u> or <u>a</u>: move in
+                        <b class="xaxis">-x</b> direction
+                    </li>
+                    <li>
+                        <u>/\</u> or <u>w</u>: move in
+                        <b class="zaxis">-z</b> direction
+                    </li>
+                    <li>
+                        <u>\/</u> or <u>s</u>: move in
+                        <b class="zaxis">+z</b> direction
+                    </li>
+                    <li><u>space</u>: let the piece fall</li>
+                </ul>
+
+                <h1>Rotation</h1>
+                <ul>
+                    <li>
+                        <u>x</u>: rotate ccw around <b class="xaxis">x</b> axis
+                    </li>
+                    <li>
+                        <u>X</u>: rotate cw around <b class="xaxis">x</b> axis
+                    </li>
+                    <li>
+                        <u>y</u>: rotate ccw around <b class="yaxis">y</b> axis
+                    </li>
+                    <li>
+                        <u>Y</u>: rotate cw around <b class="yaxis">y</b> axis
+                    </li>
+                    <li>
+                        <u>z</u>: rotate ccw around <b class="zaxis">z</b> axis
+                    </li>
+                    <li>
+                        <u>Z</u>: rotate cw around <b class="zaxis">z</b> axis
+                    </li>
+                </ul>
+
+                <h1>Viewport</h1>
+                <ul>
+                    <li>
+                        <u>i</u>: rotate ccw around <b class="xaxis">x</b> axis
+                    </li>
+                    <li>
+                        <u>k</u>: rotate cw around <b class="xaxis">x</b> axis
+                    </li>
+                    <li>
+                        <u>j</u>: rotate ccw around <b class="yaxis">y</b> axis
+                    </li>
+                    <li>
+                        <u>l</u>: rotate cw around <b class="yaxis">y</b> axis
+                    </li>
+                    <li>
+                        <u>u</u>: rotate ccw around <b class="zaxis">z</b> axis
+                    </li>
+                    <li>
+                        <u>o</u>: rotate cw around <b class="zaxis">z</b> axis
+                    </li>
+                    <li><u>+</u> or <u>scroll up</u>: zoom in</li>
+                    <li><u>-</u> or <u>scroll down</u>: zoom out</li>
+                    <li>
+                        <u>dragging mouse</u>: rotate around
+                        <b class="yaxis">y</b> axis
+                    </li>
+                </ul>
+
+                <h1>Miscellaneous</h1>
+                <ul>
+                    <li><u>g</u>: toggle full grid</li>
+                    <li><u>v</u>: toggle orthographic/perspective view</li>
+                    <li><u>f</u>: switch shader (phong/gouraud)</li>
+                    <li><u>v</u>: toggle between cubes/cylinders</li>
+                    <li><u>m</u>: toggle music</li>
+                    <li><u>#</u>: toggle axis overlay</li>
+                </ul>
+            </details>
         </div>
+        <p id="deltaTime"></p>
 
         <div class="floatingwidget" id="popup">
             <h1 id="gameover">Game Over</h1>
