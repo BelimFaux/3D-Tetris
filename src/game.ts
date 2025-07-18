@@ -24,7 +24,7 @@ interface GameOptions {
 
 function defaultOptions(): GameOptions {
     return {
-        gravity: false,
+        gravity: true,
         showGrid: false,
         perspective: false,
         gouraud: false,
@@ -57,6 +57,7 @@ export class Game {
     constructor(gl: WebGL2RenderingContext) {
         this.gl = gl;
         this.options = defaultOptions();
+        this.options.gravity = false;
         this.gameOver = false;
         this.camera = new Camera();
         this.music = new Audio('ressources/sounds/TetriX.wav');
@@ -88,10 +89,6 @@ export class Game {
         this.movePiecesBy = 0;
         this.score = 0;
         ui.updateScore(this.score);
-
-        new MouseHandler(this.camera);
-        new KeyboardHandler(this);
-        ui.registerGame(this);
     }
 
     private spawnNewPiece() {
@@ -103,6 +100,15 @@ export class Game {
         this.activePiece.initVaos(this.gl, this.shader);
         this.nextPiece = Math.floor(Math.random() * 7);
         ui.updateNextPiece(this.nextPiece);
+    }
+
+    startGame() {
+        new MouseHandler(this.camera);
+        new KeyboardHandler(this);
+        this.options.gravity = defaultOptions().gravity;
+        this.spawnNewPiece();
+        this.grid = new Grid();
+        this.grid.initVao(this.gl, this.shader);
     }
 
     cheatCode() {
@@ -134,6 +140,12 @@ export class Game {
         if (this.options.musicPlaying) this.music.pause();
         else this.music.play();
         this.options.musicPlaying = !this.options.musicPlaying;
+    }
+
+    setMusic(playing: boolean) {
+        this.options.musicPlaying = playing;
+        if (this.options.musicPlaying) this.music.play();
+        else this.music.pause();
     }
 
     togglePerspective() {
@@ -190,7 +202,7 @@ export class Game {
         if (this.activePiece.testCollisions() & CollisionEvent.TOP) {
             this.gameOver = true;
             this.music.pause();
-            ui.openPopUp(this.score);
+            ui.openGameoverPopUp(this.score);
             return;
         }
         this.activePiece.snapToGrid();

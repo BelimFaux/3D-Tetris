@@ -1,18 +1,14 @@
 import type { Game } from './game.js';
 import { TetracubeType } from './objects/tetracube.js';
+import { setDimension } from './utils/constants.js';
 
 /**
- * Adds the error message to the error box on screen and also prints it to the console.
+ * Alert the user that an error occured and also prints it to the console.
  *
  * @param {string} errorMessage - the message that should be reported
  */
 export function reportError(errorMessage: string): void {
-    const errorBoxDiv = document.getElementById('error-box');
-    const errorTextElement = document.createElement('p');
-    errorTextElement.innerText = errorMessage;
-    if (errorBoxDiv !== null) {
-        errorBoxDiv.appendChild(errorTextElement);
-    }
+    alert(errorMessage);
     console.error(errorMessage);
 }
 
@@ -76,24 +72,56 @@ export function setValue(id: string, value: any): void {
     }
 }
 
-function setPopUp(visibility: string): void {
-    const popUp = document.getElementById('popup');
+function setPopUp(popupname: string, visibility: string): void {
+    const popUp = document.getElementById(popupname + 'Popup');
     if (popUp) {
         popUp.style.visibility = visibility;
     }
 }
 
-export function openPopUp(finalScore: number): void {
-    setPopUp('visible');
+export function openGameoverPopUp(finalScore: number): void {
+    setPopUp('gameover', 'visible');
     setValue('finalScoreVal', finalScore);
 }
 
+export function openStartPopUp(): void {
+    setPopUp('start', 'visible');
+}
+
 export function registerGame(game: Game): void {
-    const button = document.getElementById('newgame');
-    if (!button) return;
-    button.onclick = () => {
-        game.restartGame();
-        setPopUp('hidden');
+    const newGameButton = document.getElementById('newgame');
+    if (newGameButton) {
+        newGameButton.onclick = () => {
+            game.restartGame();
+            setPopUp('gameover', 'hidden');
+            document.getElementById('canvas')?.focus();
+        };
+    }
+    const startGameButton = document.getElementById('startgame');
+    if (!startGameButton) return;
+    startGameButton.onclick = () => {
+        const playMusic = document.getElementById(
+            'playMusic',
+        ) as HTMLInputElement | null;
+        if (playMusic) game.setMusic(playMusic.checked);
+
+        const cylinders = document.getElementById(
+            'enableCylinders',
+        ) as HTMLInputElement | null;
+        if (cylinders) game.options.cylinders = cylinders.checked;
+
+        const axis = document.getElementById(
+            'enableAxis',
+        ) as HTMLInputElement | null;
+        if (axis) game.options.axisOverlay = axis.checked;
+
+        const size = document.getElementById(
+            'fieldSize',
+        ) as HTMLSelectElement | null;
+        if (size) setDimension(size.value);
+
+        game.startGame();
+        setPopUp('start', 'hidden');
         document.getElementById('canvas')?.focus();
     };
 }

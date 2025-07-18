@@ -52,7 +52,10 @@ async function setup(): Promise<WebGL2RenderingContext | null> {
 }
 
 function main(gl: WebGL2RenderingContext): void {
+    ui.openStartPopUp();
+
     const game = new Game(gl);
+    ui.registerGame(game);
 
     let lastTime = 0;
     let lastUpdate = 0;

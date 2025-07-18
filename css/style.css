@@ -119,14 +119,26 @@ details ul {
     text-align: center;
 }
 
-#gameover {
+.optionToggles {
+    text-align: center;
+    margin-bottom: 20px;
+
+    select {
+        background-color: var(--widget-bg);
+        color: var(--text-color);
+        border: 1px solid var(--widget-border);
+        border-radius: 5px;
+    }
+}
+
+.popupTitle {
     font-family: 'Inter', sans-serif;
     text-align: center;
     font-size: 30px;
     padding-top: 15px;
 }
 
-#newgame {
+.popupButton {
     display: block;
     color: var(--text-color);
     background-color: var(--widget-bg);
