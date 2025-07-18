@@ -90,6 +90,8 @@ I have tested the site with Mozilla Firefox 136.0.3 browser.
 
 ## Credit
 
+- As the only external library, I used [gl-matrix](https://glmatrix.net/) for vector and matrix operations
+
 - I used the following ressources for the textures with just minimal alignment changes:
     - [https://stock.adobe.com/at/images/wooden-crate-front-view-cargo-box-texture-3d-rendering/199149984](https://stock.adobe.com/at/images/wooden-crate-front-view-cargo-box-texture-3d-rendering/199149984)
     - [https://www.pinterest.com/pin/89157267620469807/](https://www.pinterest.com/pin/89157267620469807/)
