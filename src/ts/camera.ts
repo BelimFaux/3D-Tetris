@@ -1,4 +1,4 @@
-import * as glm from './gl-matrix/index.js';
+import * as glm from 'gl-matrix';
 import { AXIS } from './utils/globals.js';
 
 /**

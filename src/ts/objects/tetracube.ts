@@ -1,5 +1,5 @@
 import type { Game } from '../game.js';
-import * as glm from '../gl-matrix/index.js';
+import * as glm from 'gl-matrix';
 
 import type { Shader } from '../shader';
 import { AXIS, DIM } from '../utils/globals.js';

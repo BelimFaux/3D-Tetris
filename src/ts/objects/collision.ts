@@ -1,4 +1,4 @@
-import * as glm from '../gl-matrix/index.js';
+import * as glm from 'gl-matrix';
 
 import { DIM } from '../utils/globals.js';
 import { Tetracube } from './tetracube.js';

@@ -1,4 +1,4 @@
-import * as glm from '../gl-matrix/index.js';
+import * as glm from 'gl-matrix';
 import type { Shader } from '../shader.js';
 import { DIM } from '../utils/globals.js';
 import { getFile, getTexture } from '../utils/files.js';

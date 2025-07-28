@@ -1,5 +1,5 @@
 import type { Camera } from '../camera.js';
-import * as glm from '../gl-matrix/index.js';
+import * as glm from 'gl-matrix';
 
 /**
  * Class that handles mouse events
