@@ -1,9 +1,8 @@
 import * as ui from './ui.js';
-import { addImage, loadAllTextures, loadFile } from './utils/files.js';
+import { addImage, loadAllTextures } from './utils/files.js';
 import { resizeCanvas } from './utils/webgl.js';
 import { Game } from './game.js';
 import { loadShaders } from './shader.js';
-import { parseObjData } from './objects/cube.js';
 
 /**
  * Preloads all assets and initializes the rendering context
@@ -11,15 +10,6 @@ import { parseObjData } from './objects/cube.js';
  * @returns {Promise<WebGL2RenderingContext | null>} the rendering context or null if any error occured (no canvas or webgl not supported)
  */
 async function setup(): Promise<WebGL2RenderingContext | null> {
-    await loadFile('shaders/gouraud.frag');
-    await loadFile('shaders/gouraud.vert');
-    await loadFile('shaders/phong.frag');
-    await loadFile('shaders/phong.vert');
-
-    await loadFile('ressources/models/cube.obj');
-    await loadFile('ressources/models/cylinder.obj');
-    parseObjData();
-
     addImage('ressources/textures/crateTexture.webp');
     addImage('ressources/textures/barrelTexture.webp');
 

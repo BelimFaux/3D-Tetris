@@ -1,9 +1,10 @@
 import type { mat4 } from 'gl-matrix';
 import type { Slider } from './input/slider.js';
-import { getFile } from './utils/files.js';
-import * as ui from './ui.js';
 
-const availableShaders = ['gouraud', 'phong'];
+import phongVertexSourve from '../assets/shaders/phong.vert?raw';
+import phongFragSourve from '../assets/shaders/phong.frag?raw';
+import gouraudVertexSourve from '../assets/shaders/gouraud.vert?raw';
+import gouraudFragSourve from '../assets/shaders/gouraud.frag?raw';
 
 /**
  * Class to generate shader programs
@@ -176,17 +177,16 @@ export class Shader {
 const shaderMap = new Map<string, Shader>();
 
 /**
- * Load all Shaders specified in the availableShaders Array into a Map
+ * Load all Shaders specified into a Map
  *
  * @param gl {WebGL2RenderingContext} - the WebGl context
  */
 export function loadShaders(gl: WebGL2RenderingContext): void {
-    for (const name of availableShaders) {
-        const shader = loadShader(gl, name);
-        if (shader) {
-            shaderMap.set(name, shader);
-        }
-    }
+    shaderMap.set(
+        'gouraud',
+        loadShader(gl, gouraudVertexSourve, gouraudFragSourve),
+    );
+    shaderMap.set('phong', loadShader(gl, phongVertexSourve, phongFragSourve));
 }
 
 /**
@@ -213,21 +213,16 @@ export function getShader(name: string): Shader {
  * @param name {string} - the name of the shader
  * @returns {Shader | null} the shader if it could be compiled or null
  */
-function loadShader(gl: WebGL2RenderingContext, name: string): Shader | null {
-    // load shader source
-    const vertexSource = getFile(`shaders/${name}.vert`);
-    const fragmentSource = getFile(`shaders/${name}.frag`);
+function loadShader(
+    gl: WebGL2RenderingContext,
+    vertexSource: string,
+    fragmentSource: string,
+): Shader {
+    // create program from shaders
+    const shader = new Shader(gl)
+        .addShader(vertexSource, gl.VERTEX_SHADER)
+        .addShader(fragmentSource, gl.FRAGMENT_SHADER)
+        .link();
 
-    try {
-        // create program from shaders
-        const shader = new Shader(gl)
-            .addShader(vertexSource, gl.VERTEX_SHADER)
-            .addShader(fragmentSource, gl.FRAGMENT_SHADER)
-            .link();
-
-        return shader;
-    } catch (e) {
-        ui.reportError(`Error while compiling shader ${name}: ${e}`);
-        return null;
-    }
+    return shader;
 }

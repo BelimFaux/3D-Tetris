@@ -3,21 +3,15 @@ import * as glm from 'gl-matrix';
 
 import type { Shader } from '../shader.js';
 import { DIM } from '../utils/globals.js';
-import { getFile, getTexture } from '../utils/files.js';
+import { getTexture } from '../utils/files.js';
 import { ObjParser, type ObjData } from './objparser.js';
 
-let cubeData: ObjData;
-let cylinderData: ObjData;
+import cubeSource from '../../assets/models/cube.obj?raw';
+import cylinderSource from '../../assets/models/cylinder.obj?raw';
 
-/**
- * parse data for primitives (cube and cylinder)
- * will fail if the files have not been loaded before
- */
-export function parseObjData(): void {
-    const parser = new ObjParser();
-    cubeData = parser.parse(getFile('ressources/models/cube.obj'));
-    cylinderData = parser.parse(getFile('ressources/models/cylinder.obj'));
-}
+const parser = new ObjParser();
+let cubeData = parser.parse(cubeSource);
+let cylinderData = parser.parse(cylinderSource);
 
 /**
  * get a random color
