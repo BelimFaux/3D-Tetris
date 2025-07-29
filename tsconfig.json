@@ -1,21 +1,22 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
+    "target": "ESNext",
     "useDefineForClassFields": true,
     "module": "ESNext",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "skipLibCheck": true,
+    "types": ["vite/client"],
 
-    "moduleResolution": "bundler",
+    "moduleResolution": "Node",
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
     "noEmit": true,
+    "preserveSymlinks": false,
 
     // strictness
     "strict": true,
     "noUncheckedIndexedAccess": true,
-    "noImplicitOverride": true,
     "allowUnusedLabels": false,
     "allowUnreachableCode": false,
     "exactOptionalPropertyTypes": true,
@@ -23,7 +24,6 @@
     "noImplicitOverride": true,
     "noImplicitReturns": true,
     "noPropertyAccessFromIndexSignature": true,
-    "noUncheckedIndexedAccess": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true
   },

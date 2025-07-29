@@ -1,5 +1,6 @@
 import * as glm from 'gl-matrix';
 
+import type { mat4 } from 'gl-matrix';
 import type { Game } from '../game.js';
 import type { Shader } from '../shader.js';
 

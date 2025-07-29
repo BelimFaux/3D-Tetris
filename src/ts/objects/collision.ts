@@ -1,3 +1,4 @@
+import type { vec3 } from 'gl-matrix';
 import * as glm from 'gl-matrix';
 
 import { DIM } from '../utils/globals.js';
@@ -20,7 +21,7 @@ export enum CollisionEvent {
  * Class to represent a cube in the grid as a list of coordinates
  */
 class GridCube {
-    coordinates;
+    coordinates: Array<vec3>;
 
     /**
      * construct a new gridcube from a list of coordinates

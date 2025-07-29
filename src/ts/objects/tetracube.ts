@@ -1,4 +1,5 @@
 import type { Game } from '../game.js';
+import type { vec3, mat4 } from 'gl-matrix';
 import * as glm from 'gl-matrix';
 
 import type { Shader } from '../shader';
@@ -159,11 +160,11 @@ function buildCubeList(type: TetracubeType): Array<Cube> {
  * Class to represent a Tetracube
  */
 export class Tetracube {
-    cubes;
-    position;
-    translation;
-    rotation;
-    game;
+    cubes: Array<Cube>;
+    position: vec3;
+    translation: mat4;
+    rotation: mat4;
+    game: Game;
 
     /**
      * Construct a new tetracube

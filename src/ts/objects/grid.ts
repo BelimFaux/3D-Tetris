@@ -1,3 +1,4 @@
+import { vec3, mat4 } from 'gl-matrix';
 import * as glm from 'gl-matrix';
 
 import { DIM } from '../utils/globals.js';
@@ -12,9 +13,9 @@ const GRID_COLOR = [1, 1, 1, 1];
  * A grid element that lies in one plane
  */
 class GridElement {
-    vertices;
-    indices;
-    midpoint;
+    vertices: Float32Array;
+    indices: Uint16Array;
+    midpoint: vec3;
     vaoIndex: WebGLVertexArrayObject = -1;
 
     /**
@@ -111,8 +112,8 @@ function constructABCGrid(
     cVal: number,
     getPoint: PointMapper,
 ): GridElement {
-    let vertices = [];
-    let indices = [];
+    let vertices: Array<number[]> = [];
+    let indices: Array<number[]> = [];
 
     const maxA = aSize / 2;
     const minA = -maxA;
@@ -139,10 +140,12 @@ function constructABCGrid(
         indices.push([i, i + 1]);
     }
 
+    const [xp, yp, zp] = getPoint(0, 0, cVal);
+
     return new GridElement(
         new Float32Array(vertices.flat()),
         new Uint16Array(indices.flat()),
-        getPoint(0, 0, cVal),
+        vec3.fromValues(xp ?? 0, yp ?? 0, zp ?? 0), // for some reason tsc cant infer the type correctly here
     );
 }
 

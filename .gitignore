@@ -1,5 +1,2 @@
-# dont track generated js files
-js/*
-!js/.gitkeep
 node_modules
 dist

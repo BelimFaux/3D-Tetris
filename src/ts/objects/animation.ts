@@ -1,3 +1,4 @@
+import type { mat4 } from 'gl-matrix';
 import type { Shader } from '../shader.js';
 import type { Tetracube } from './tetracube.js';
 
@@ -5,9 +6,9 @@ import type { Tetracube } from './tetracube.js';
  * Class to perform a blink effect on a list of pieces for a given duration
  */
 export class BlinkingEffect {
-    pieces;
-    duration;
-    deltaTime;
+    pieces: Array<Tetracube>;
+    duration: number;
+    deltaTime: number;
 
     /**
      * construct a new blink effect for the given pieces for the given duration

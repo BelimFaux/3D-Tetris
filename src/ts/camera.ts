@@ -1,3 +1,4 @@
+import type { vec3, mat4 } from 'gl-matrix';
 import * as glm from 'gl-matrix';
 import { AXIS } from './utils/globals.js';
 
@@ -5,12 +6,12 @@ import { AXIS } from './utils/globals.js';
  * Class to represent a Camera and handle view-related tasks
  */
 export class Camera {
-    projectionMatrix;
-    viewMatrix;
-    viewTransforms;
-    perspective;
-    halfWorldWidth;
-    eye;
+    projectionMatrix: mat4;
+    viewMatrix: mat4;
+    viewTransforms: mat4;
+    perspective: boolean;
+    halfWorldWidth: number;
+    eye: vec3;
 
     /**
      * Construct a new camera

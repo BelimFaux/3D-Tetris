@@ -1,3 +1,4 @@
+import type { mat4 } from 'gl-matrix';
 import type { Slider } from './input/slider.js';
 import { getFile } from './utils/files.js';
 import * as ui from './ui.js';

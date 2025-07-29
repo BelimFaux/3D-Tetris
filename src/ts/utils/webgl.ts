@@ -1,5 +1,3 @@
-import * as glm from 'gl-matrix';
-
 /**
  * Resizes the canvas to match the actual amount of pixels
  *

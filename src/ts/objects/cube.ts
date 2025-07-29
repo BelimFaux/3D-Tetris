@@ -1,4 +1,6 @@
+import type { vec3, vec4, mat4 } from 'gl-matrix';
 import * as glm from 'gl-matrix';
+
 import type { Shader } from '../shader.js';
 import { DIM } from '../utils/globals.js';
 import { getFile, getTexture } from '../utils/files.js';
@@ -30,10 +32,10 @@ export function getRandomColor(): vec4 {
  * Class to represent a cube
  */
 export class Cube {
-    cubeData;
-    cylinderData;
-    color;
-    displace;
+    cubeData: ObjData;
+    cylinderData: ObjData;
+    color: vec4;
+    displace: vec3;
     textured: boolean = false;
     cubeVaoIndex: WebGLVertexArrayObject = -1;
     cylinderVaoIndex: WebGLVertexArrayObject = -1;
