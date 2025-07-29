@@ -71,17 +71,20 @@ There are some other notable features:
 
 ## Running the site
 
-First compile the Typescript code to Javascript by just invoking the Typescript compiler in the root directory of the site:
+Install all packages and build the site:
 
 ```bash
-tsc
+pnpm install
+pnpm run build
 ```
 
-Then you should be able to run the site by just starting an http server in the root directory:
+Then you should be able to run the site by just starting an http server in the `dist` directory:
 
 ```bash
+cd dist
 python -m http.server 8080
 # or
+cd dist
 live-server
 ```
 
