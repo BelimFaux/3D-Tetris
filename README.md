@@ -20,7 +20,7 @@ There are some other notable features:
 - You can switch out the cubes that the tetracubes consist of for cylinders by pressing _f_. This has no use other than showing differences in shaders better
 - You can also select some of these options in the start menu, along with the size of the playing field
 - Every tetracube has a 1/10 chance of being textured. This has also no practical effect
-- A complete list of controls can be found on the site under the `Keybindings` collabsible or in the [Controls](#controls) section
+- A complete list of controls can be found on the site under the `Keybinds` collabsible or in the [Controls](#controls) section
 
 ## Controls
 
