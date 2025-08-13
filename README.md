@@ -5,6 +5,8 @@ This was originally written for the [GFX 25S course of University of Vienna](htt
 
 You can play the game, by cloning the repo and then compiling and running the site as described in the [Running the site section](#running-the-site).
 
+![example ingame screenshot](./examples/example_screenshot.png)
+
 ## Gameplay
 
 The game plays similar to a normal tetris game, with the differences, that there are more pieces (the tetracubes as defined [here](https://www.mathematische-basteleien.de/tetracube.htm)) and you have to fill an entire horizontal 2D slice for the pieces to disappear.
