@@ -1,4 +1,5 @@
 import type { Game } from './game.js';
+import { getLeaderboardRecords } from './leaderboard.js';
 import { TetracubeType } from './objects/tetracube.js';
 import { setDimension } from './utils/globals.js';
 
@@ -86,11 +87,35 @@ function setPopUp(popupname: string, visibility: string): void {
 }
 
 /**
+ * Populate the leaderboard element with the saved records
+ */
+function populateLeaderboard() {
+    const leaderboard = document.getElementById('leaderboard');
+    if (!leaderboard) return;
+    const leaderboardRecords = getLeaderboardRecords();
+    leaderboard.innerHTML = '';
+    leaderboardRecords.forEach((rec) => {
+        const row = document.createElement('tr');
+        const nameCell = document.createElement('td');
+        const nameTag = document.createTextNode(rec.name);
+        nameCell.appendChild(nameTag);
+        const scoreCell = document.createElement('td');
+        const scoreTag = document.createTextNode(`${rec.score}`);
+        scoreCell.appendChild(scoreTag);
+
+        row.appendChild(nameCell);
+        row.appendChild(scoreCell);
+        leaderboard.appendChild(row);
+    });
+}
+
+/**
  * Opens the Game over popup and displays the final score
  *
  * @param finalScore {number} the score to display
  */
 export function openGameoverPopUp(finalScore: number): void {
+    populateLeaderboard();
     setPopUp('gameover', 'visible');
     setValue('finalScoreVal', finalScore);
 }
@@ -148,6 +173,9 @@ export function registerGame(game: Game): void {
     };
 }
 
+/**
+ * Prompt the player for a name and return the given string
+ */
 export function promptPlayerName(): string {
     return prompt('Please enter your name:') ?? '';
 }

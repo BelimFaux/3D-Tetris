@@ -4,7 +4,7 @@ const SAVED_RECORDS: number = 3;
 /**
  * A record of the leaderboard consisting of player name and score
  */
-interface LeaderboardRecord {
+export interface LeaderboardRecord {
     name: string;
     score: number;
 }
@@ -69,4 +69,14 @@ export function isHighscore(score: number): boolean {
         leaderboard.records.length < SAVED_RECORDS ||
         leaderboard.records.some((rec) => rec.score < score)
     );
+}
+
+/**
+ * Get all leaderboard records
+ *
+ * @returns {LeaderboardRecord} a list of all saved records
+ */
+export function getLeaderboardRecords(): Array<LeaderboardRecord> {
+    const leaderboard = getLeaderboard();
+    return leaderboard.records;
 }
