@@ -147,3 +147,7 @@ export function registerGame(game: Game): void {
         document.getElementById('canvas')?.focus();
     };
 }
+
+export function promptPlayerName(): string {
+    return prompt('Please enter your name:') ?? '';
+}

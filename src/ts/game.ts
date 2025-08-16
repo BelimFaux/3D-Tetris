@@ -11,6 +11,7 @@ import { DIM } from './utils/globals.js';
 import { Slider } from './input/slider.js';
 import { BlinkingEffect } from './objects/animation.js';
 import { AxisOverlay } from './objects/axis.js';
+import { isHighscore, registerNewScore } from './leaderboard.js';
 
 /**
  * Interface for all game related options
@@ -153,9 +154,7 @@ export class Game {
      */
     private handleLandedPiece(): void {
         if (this.activePiece.testCollisions() & CollisionEvent.TOP) {
-            this.gameOver = true;
-            this.music.pause();
-            ui.openGameoverPopUp(this.score);
+            this.endGame();
             return;
         }
         this.activePiece.snapToGrid();
@@ -229,6 +228,16 @@ export class Game {
         // tell gravity how many lines landed pieces can move down by
         this.movePiecesBy += killed;
         this.adjustScore(killed);
+    }
+
+    private endGame(): void {
+        this.gameOver = true;
+        if (isHighscore(this.score)) {
+            const name = ui.promptPlayerName();
+            registerNewScore(name, this.score);
+        }
+        this.music.pause();
+        ui.openGameoverPopUp(this.score);
     }
 
     /**
