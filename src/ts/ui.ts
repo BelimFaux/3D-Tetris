@@ -127,6 +127,13 @@ export function openGameoverPopUp(finalScore: number): void {
     populateLeaderboard();
     setPopUp('gameover', 'visible');
     setValue('finalScoreVal', finalScore);
+    const menuButton = document.getElementById('gotomenu');
+
+    if (!menuButton) return;
+    menuButton.onclick = () => {
+        openStartPopUp();
+        setPopUp('gameover', 'hidden');
+    };
 }
 
 /**

@@ -340,6 +340,7 @@ export class Game {
         this.spawnNewPiece();
         this.grid = new Grid();
         this.grid.initVao(this.gl, this.shader);
+        if (this.gameOver) this.restartGame();
     }
 
     /**

@@ -186,3 +186,7 @@ details ul {
 .popupButton:hover {
     background-color: var(--widget-hover);
 }
+
+.buttonContainer {
+    display: flex;
+}
