@@ -92,8 +92,17 @@ function setPopUp(popupname: string, visibility: string): void {
 function populateLeaderboard() {
     const leaderboard = document.getElementById('leaderboard');
     if (!leaderboard) return;
-    const leaderboardRecords = getLeaderboardRecords();
     leaderboard.innerHTML = '';
+    const tbody = document.createElement('tbody');
+    tbody.innerHTML = `
+    <tr>
+        <th>Name</th>
+        <th>Score</th>
+    </tr>
+    `;
+    leaderboard.appendChild(tbody);
+
+    const leaderboardRecords = getLeaderboardRecords();
     leaderboardRecords.forEach((rec) => {
         const row = document.createElement('tr');
         const nameCell = document.createElement('td');
@@ -105,7 +114,7 @@ function populateLeaderboard() {
 
         row.appendChild(nameCell);
         row.appendChild(scoreCell);
-        leaderboard.appendChild(row);
+        tbody.appendChild(row);
     });
 }
 

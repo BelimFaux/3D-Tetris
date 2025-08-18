@@ -231,6 +231,7 @@ export class Game {
     }
 
     private endGame(): void {
+        if (this.gameOver) return;
         this.gameOver = true;
         if (isHighscore(this.score)) {
             const name = ui.promptPlayerName();

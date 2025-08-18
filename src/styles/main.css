@@ -120,10 +120,27 @@ details ul {
 
 .floatingwidget:hover {
     border: 1px solid var(--popup-active);
+    transition-duration: 200ms;
 }
 
 #finalscore {
     text-align: center;
+}
+
+#leaderboard {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding-bottom: 1rem;
+    border-collapse: collapse;
+
+    th,
+    td {
+        border-bottom: 1px solid var(--popup-active);
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
 }
 
 .optionToggles {
