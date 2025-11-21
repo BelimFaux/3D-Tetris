@@ -1,5 +1,8 @@
 # 3D Tetris
 
+> [!WARNING]
+> This repo was moved to [https://codeberg.org/belim_faux/3D-Tetris](https://codeberg.org/belim_faux/3D-Tetris)
+
 A 3D version of Tetris written in Typescript using WebGl.
 This was originally written for the [GFX 25S course of University of Vienna](https://ufind.univie.ac.at/en/course.html?lv=052200&semester=2025S).
 
